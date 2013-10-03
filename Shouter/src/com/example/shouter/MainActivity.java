@@ -19,10 +19,12 @@ public class MainActivity extends Activity {
 
 	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE";
 	List<Map<String, String>> shoutList = new ArrayList<Map<String,String>>();
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_list_item);
 		
 		initList();
 		ListView lv = (ListView) findViewById(R.id.listView);
