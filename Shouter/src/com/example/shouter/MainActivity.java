@@ -1,6 +1,9 @@
 package com.example.shouter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import android.R;
 import android.app.Activity;
@@ -15,7 +18,7 @@ import android.widget.SimpleAdapter;
 public class MainActivity extends Activity {
 
 	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE";
-	
+	List<Map<String, String>> shoutList = new ArrayList<Map<String,String>>();
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,11 +47,22 @@ public class MainActivity extends Activity {
 		startActivity(intent);
 		
 	}
+	
+	private void initList(){
+		shoutList.add(createShout("shout", "Test Shout 1"));
+		shoutList.add(createShout("shout", "Just Making Sure the App is working"));
+		shoutList.add(createShout("shout", "Woot Shouter"));
+		shoutList.add(createShout("shout", "Anoter Test Shout"));
+		shoutList.add(createShout("shout", "Test Shout 5"));
+		shoutList.add(createShout("shout", "Test Shout 6"));
+		shoutList.add(createShout("shout", "Test Shout 7"));
+		
+	}
 
 //Use hashmaps to populate list. Can be expanded on once shout structure has been defined.
-	private HashMap<String, String> createShout(String name, String shout){
+	private HashMap<String, String> createShout(String name, String message){
 		HashMap<String, String> shout = new HashMap<String, String>();
-		shout.put(name, shout)
-		return shout
+		shout.put(name, message);
+		return shout;
 	}
 }
