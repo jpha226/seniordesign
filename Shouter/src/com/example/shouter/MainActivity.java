@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import android.R;
+import android.R.id;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,11 +25,11 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_list_item);
+		setContentView(R.layout.activity_main);
 		
 		initList();
 		ListView lv = (ListView) findViewById(R.id.listView);
-		simpleAdpt = new SimpleAdapter(this, shoutList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[] {android.R.id.text1});
+		SimpleAdapter simpleAdpt = new SimpleAdapter(this, shoutList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[] {android.R.id.text1});
 		lv.setAdapter(simpleAdpt);
 	}
 
@@ -39,7 +40,11 @@ public class MainActivity extends Activity {
 		return true;
 	}
 	
-	public void sendMessage(View view){
+	/*
+	 *  This function will push the entered message into the database. 
+	 *  The message will also be added to the displayed shouts
+	 */
+	public void postMessage(View view){
 		// Do something in response to button
 		
 		Intent intent = new Intent(this, DisplayMessageActivity.class);
@@ -47,6 +52,18 @@ public class MainActivity extends Activity {
 		String message = editText.getText().toString();
 		intent.putExtra(EXTRA_MESSAGE, message);
 		startActivity(intent);
+		
+		
+		refresh(view); // automatically refresh after posting message
+		
+	}
+	
+	/* This function will pull shouts from the database and update displayed shouts
+	 * 
+	 */
+	public void refresh(View view){
+		
+		// Implement refresh function
 		
 	}
 	
