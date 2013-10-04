@@ -5,8 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.R;
-import android.R.id;
+//import android.R;
+//import android.R.id;
+//import android.R.menu;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
