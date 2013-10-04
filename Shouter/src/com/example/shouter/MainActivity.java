@@ -17,7 +17,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements CallAPI{
 
 	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE";
 	List<Map<String, String>> shoutList = new ArrayList<Map<String,String>>();
