@@ -1,18 +1,20 @@
 package com.example.shouter;
 
 import java.sql.Timestamp;
+import android.location.*;
 
 public class Shout {
 
-	private String message, id, userID, parentID, location_stamp;
+	private String message, id, userID, parentID;
 	private Timestamp time_stamp;
+	private Location location_stamp;
 	
 	
 	// Constructor
-	public Shout(String m, String loc, Timestamp t){}
+	public Shout(String m, Location loc){}
 	
 	// Constructor for comment
-	public Shout(String m, String loc, Timestamp t, String p){}
+	public Shout(String m, Location loc, String p){}
 	
 	// Accessor functions
 	public String getMessage(){return message;}
@@ -23,7 +25,7 @@ public class Shout {
 	
 	public String getParent(){return parentID;}
 	
-	public String getLocation(){return location_stamp;}
+	public Location getLocation(){return location_stamp;}
 	
 	public Timestamp getTime(){return time_stamp;}
 	
@@ -37,7 +39,7 @@ public class Shout {
 	
 	public void setParent(String p){parentID = p;}
 	
-	public void setLocation(String loc){location_stamp = loc;}
+	public void setLocation(Location loc){location_stamp = loc;}
 	
 	public void setTime(Timestamp time){time_stamp = time;}
 

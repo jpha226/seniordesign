@@ -24,7 +24,7 @@
         android:text="@string/button_refresh" />
         
  	<ListView
- 	    android:id="@+id/listView"
+ 	    android:id="@+id/ListView"
  	    android:layout_width="wrap_content"
  	    android:layout_height="wrap_content" />
     

@@ -1,17 +1,43 @@
 package com.example.shouter;
 
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 
+ * @author Josiah
+ * Class for accessing the API
+ *
+ */
 public class Utility {
 
-	// Function to interact with API for posting to database
-	// Takes a shout object and converts it to JSON for pushing to database
-	public void post(Shout shout) {}
+
+	/**
+	 * @author Josiah
+	 * @param shout - The shout to be converted to JSON and pushed to the database
+	 * Function pushes shout to database
+	 */
+	public static void post(Shout shout) {}
 	
-	// Function to interact with API for pulling from database
-	// Returns a list of shout objects in correct order
-	public List<Shout> pull(){return null;}
+
+	/**
+	 * Function for accessing the API to refresh the posts the user sees
+	 * @return - A list of shouts that the user has not seen yet
+	 */
+	public static List<Shout> pull(){
+		
+		Shout s = new Shout("This is a shout", null);
+		Shout a = new Shout("This is shout a!", null);
+		
+		List<Shout> result = new ArrayList<Shout>();
+		
+		result.add(s);
+		result.add(a);
+		return result;
+		
+	}
+	
+	public static List<Shout> getChildren(String parentID){return null;}
 	
 	
 }
- 
