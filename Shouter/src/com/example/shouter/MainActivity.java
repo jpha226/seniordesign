@@ -10,6 +10,9 @@ import java.util.Map;
 //import com.google.android.gms.common.GooglePlayServicesUtil;
 //import com.google.android.gms.location.LocationClient;
 
+
+import com.google.android.gms.location.LocationListener;
+
 import android.annotation.SuppressLint;
 //import android.R;
 //import android.R.id;
@@ -29,11 +32,11 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 
-public class MainActivity extends Activity {// implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
+public class MainActivity extends Activity implements LocationListener {// implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
 
 	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE";
 	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-	//private LocationClient myClient;
+	private UserLocation userLocation;
 	
 	List<Shout> shoutList = new ArrayList<Shout>();
 	
@@ -69,14 +72,13 @@ public class MainActivity extends Activity {// implements GooglePlayServicesClie
 	public void postMessage(View view){
 		// Do something in response to button
 		
-		//Location loc = myClient.getLastLocation();
-		
 		Intent intent = new Intent(this, DisplayMessageActivity.class);
 		EditText editText = (EditText) findViewById(R.id.edit_message);
 		String message = editText.getText().toString();
 		intent.putExtra(EXTRA_MESSAGE, message);
 		startActivity(intent);
 		
+		Location current = getCurrentLocation();
 		
 		Shout myShout = new Shout(message, null);
 		
@@ -90,6 +92,7 @@ public class MainActivity extends Activity {// implements GooglePlayServicesClie
 	 */
 	public void refresh(View view){
 		
+		Location current = getCurrentLocation();
 		
 	}
 	
@@ -113,106 +116,20 @@ public class MainActivity extends Activity {// implements GooglePlayServicesClie
 		return shout;
 		
 	}
-	
-	/*/ Define a DialogFragment that displays the error dialog
-    @SuppressLint("NewApi")
-	public static class ErrorDialogFragment extends DialogFragment {
-        // Global field to contain the error dialog
-        private Dialog mDialog;
-        // Default constructor. Sets the dialog field to null
-        @SuppressLint("NewApi")
-		public ErrorDialogFragment() {
-            super();
-            mDialog = null;
-        }
-        // Set the dialog to display
-        public void setDialog(Dialog dialog) {
-            mDialog = dialog;
-        }
-        // Return a Dialog to the DialogFragment.
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return mDialog;
-        }
-    }
-    
-    /*
-     * Handle results returned to the FragmentActivity
-     * by Google Play services
-     */
-   /* @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Decide what to do based on the original request code
-        switch (requestCode) {
-    
-            case CONNECTION_FAILURE_RESOLUTION_REQUEST :
-            /*
-             * If the result code is Activity.RESULT_OK, try
-             * to connect again
-             */
-               /* switch (resultCode) {
-                    case Activity.RESULT_OK :
-                    /*
-                     * Try the request again
-                     */
-                 /*   
-                    break;
-                }
-            
-        }
-     }
-    
-  
-	private boolean servicesConnected() {
-        // Check that Google Play services is available
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        // If Google Play services is available
-        if (ConnectionResult.SUCCESS == resultCode) {
-            // In debug mode, log the status
-            Log.d("Location Updates", "Google Play services is available.");
-            // Continue
-            return true;
-        // Google Play services was not available for some reason
-        } else {
-            // Get the error code
-            int errorCode = 0;//ConnectionResult.getErrorCode();
-            // Get the error dialog from Google Play services
-            Dialog errorDialog = GooglePlayServicesUtil.getErrorDialog(errorCode, this, CONNECTION_FAILURE_RESOLUTION_REQUEST);
 
-            // If Google Play services can provide an error dialog
-            if (errorDialog != null) {
-                // Create a new DialogFragment for the error dialog
-                ErrorDialogFragment errorFragment = new ErrorDialogFragment();
-                // Set the dialog in the DialogFragment
-                errorFragment.setDialog(errorDialog);
-                // Show the error dialog in the DialogFragment
-                errorFragment.show(getFragmentManager(), "Location Updates");
-            }
-            return false;
-        }
-    }
-
-	@Override
-	public void onConnectionFailed(ConnectionResult result) {
+	private Location getCurrentLocation(){
 		
-		 try {
-			throw new Exception("Connection failed");
-		} catch (Exception e) {e.printStackTrace();}
+		LocationListener listener = this;
+		userLocation.requestLocationUpdates(userLocation.defaultRequest(), listener);
+		
+		return userLocation.getLastLocation();
 		
 	}
 
 	@Override
-	public void onConnected(Bundle connectionHint) {
-		
-		Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
-		
-	}
-
-	@Override
-	public void onDisconnected() {
-		 Toast.makeText(this, "Disconnected. Please re-connect.", Toast.LENGTH_SHORT).show();
-		 
+	public void onLocationChanged(Location location) {
+		// TODO Auto-generated method stub
 		
 	}
 	
-*/}
+}
