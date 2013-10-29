@@ -32,12 +32,13 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 
-public class MainActivity extends Activity implements LocationListener {// implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
+public class MainActivity extends Activity{// implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
 
 	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE";
 	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+	private static final int GPS_RESOLUTION = 1;
 	private UserLocation userLocation;
-	
+	private static Location location;
 	List<Shout> shoutList = new ArrayList<Shout>();
 	
 	
@@ -78,7 +79,7 @@ public class MainActivity extends Activity implements LocationListener {// imple
 		intent.putExtra(EXTRA_MESSAGE, message);
 		startActivity(intent);
 		
-		Location current = getCurrentLocation();
+		updateLocation();
 		
 		Shout myShout = new Shout(message, null);
 		
@@ -92,7 +93,7 @@ public class MainActivity extends Activity implements LocationListener {// imple
 	 */
 	public void refresh(View view){
 		
-		Location current = getCurrentLocation();
+		updateLocation();
 		
 	}
 	
@@ -117,19 +118,29 @@ public class MainActivity extends Activity implements LocationListener {// imple
 		
 	}
 
-	private Location getCurrentLocation(){
+	private void updateLocation(){
 		
-		LocationListener listener = this;
-		userLocation.requestLocationUpdates(userLocation.defaultRequest(), listener);
+		userLocation = new UserLocation(this, GPS_RESOLUTION);
 		
-		return userLocation.getLastLocation();
+		
+		userLocation.requestLocationUpdates(userLocation.defaultRequest(), new LocationListener(){
+			
+			@Override
+			public void onLocationChanged(Location loc) {
+	
+				userLocation.disconnect();
+				
+				if (loc != null){
+					
+					location = loc;
+					
+				}
+				
+			}});
+		
 		
 	}
 
-	@Override
-	public void onLocationChanged(Location location) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 	
 }
