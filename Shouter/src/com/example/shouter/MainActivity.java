@@ -76,10 +76,17 @@ public class MainActivity extends Activity{// implements GooglePlayServicesClien
 		Intent intent = new Intent(this, DisplayMessageActivity.class);
 		EditText editText = (EditText) findViewById(R.id.edit_message);
 		String message = editText.getText().toString();
+		
+		updateLocation();
+		
+		if(location != null)
+			message = location.getLongitude()+", "+location.getLatitude();
+		else
+			message = "null";
+		
 		intent.putExtra(EXTRA_MESSAGE, message);
 		startActivity(intent);
 		
-		updateLocation();
 		
 		Shout myShout = new Shout(message, null);
 		
