@@ -42,17 +42,16 @@ public class ShouterAPI {
 		
 	}
 	
-	public void postShout(Shout message, String location, String phoneId) throws JsonGenerationException, JsonMappingException, IOException{
+	public void postShout(final Shout message) throws JsonGenerationException, JsonMappingException, IOException{
 		path = "/api/shout/create";
-		ObjectMapper mapper = new ObjectMapper();
-		shoutString = mapper.writeValueAsString(message);
+		
 		executor.submit(new Runnable(){
 			@Override
 			public void run() {
 				ResponseEntity<String> response = null;
 				try{
 					//TODO: Need to tweak to suit our API better
-					String url = Shouter_URL + path + "?location=" + location;
+					String url = Shouter_URL + path + "?phoneId=" + message.getID() + "&message=" + message.getMessage() + "&latitude=" + latitude + "&longitude=" + longitude + "&parentId=" + message.getParent(); 
 					//Creates Entity with shout as body
 					HttpEntity<String> request = new HttpEntity<String>(shoutString);
 					//Post Entity to URL
@@ -77,8 +76,7 @@ public class ShouterAPI {
 					ResponseEntity<String> response = null;
 					try {
 						HttpEntity<String> request = new HttpEntity<String>();
-						
-						String url = Shouter_URL + path + "?latitute=" + latitude;
+						String url = Shouter_URL + path + "?latitute=" + latitude + "&longitude=" + longitude;
 						response = REST.exchange(url, HttpMethod.GET, request, String.class);
 						delegate.onGetShoutReturn(ShouterAPI.this, response.getBody(), null);
 					} catch(Exception e) {
@@ -91,7 +89,7 @@ public class ShouterAPI {
 		
 	
 	
-	public void postComment(String parentId, Shout message){
+	public void postComment(final Shout message){
 
 	}
 	
@@ -103,7 +101,7 @@ public class ShouterAPI {
 			public void run() {
 				ResponseEntity<String> response = null;
 				try {
-					HttpEntity<String]> request = new HttpEntity<String>();
+					HttpEntity<String> request = new HttpEntity<String>();
 					
 					String url = Shouter_URL + path + "?parentId=" + parentId;
 					response = REST.exchange(url, HttpMethod.GET, request, String.class);
