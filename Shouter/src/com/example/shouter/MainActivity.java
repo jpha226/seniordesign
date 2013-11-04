@@ -88,8 +88,9 @@ public class MainActivity extends Activity{// implements GooglePlayServicesClien
 		startActivity(intent);
 		
 		
-		Shout myShout = new Shout(message, null);
+		Shout myShout = new Shout(message, location);
 		
+		// Post to api
 		
 		refresh(view); // automatically refresh after posting message
 		
@@ -101,6 +102,15 @@ public class MainActivity extends Activity{// implements GooglePlayServicesClien
 	public void refresh(View view){
 		
 		updateLocation();
+		
+		ArrayList<Shout> newShouts = new ArrayList<Shout>();
+		
+		
+		for(Shout s : newShouts){
+			
+			shoutList.add(s);
+			
+		}
 		
 	}
 	
