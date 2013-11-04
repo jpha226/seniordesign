@@ -27,7 +27,7 @@ public class ShouterAPI {
 	private ShouterAPIDelegate delegate;
 	private RestTemplate REST = Networking.defaultRest();
 	private String path;
-	final List<Shout> shoutList = new ArrayList<Shout>();
+	List<Shout> shoutList = new ArrayList<Shout>();
 	
 	public ShouterAPI() {
 		executor = Executors.newFixedThreadPool(5);
@@ -51,9 +51,7 @@ public class ShouterAPI {
 				try{
 					HttpHeaders headers = new HttpHeaders();
 					HttpEntity<String> request = new HttpEntity<String>(headers);
-					//TODO: Need to seperate Location into long and lat
 					String url = Shouter_URL + path + "?phoneId=" + message.getID() + "&message=" + message.getMessage() + "&latitude=" + message.getLatitude() + "&longitude=" + message.getLongitude() + "&parentId=" + message.getParent(); 
-					//Post Entity to URL
 					response = REST.exchange(url, HttpMethod.POST, request, String.class);
 					delegate.onPostShoutReturn(ShouterAPI.this, response.getBody(), null);
 					
@@ -66,9 +64,9 @@ public class ShouterAPI {
 		});
 	}
 	
-	public List<Shout> getShout(final String Location){
+	public List<Shout> getShout(final String latitude, final String longitude){
 			path = "/api/shout/search";
-			executor.submit(new Runnable() {
+			executor.submit(new Runnable() { 
 				@Override
 				public void run() {
 					ResponseEntity<String> response = null;
@@ -87,6 +85,27 @@ public class ShouterAPI {
 			return shoutList;
 	}
 		
+	public void postCOmment(final Shout message) throws JsonGenerationException, JsonMappingException, IOException{
+		path = "/api/shout/comment/create";
+		executor.submit(new Runnable(){
+			@Override
+			public void run() {
+				ResponseEntity<String> response = null;
+				try{
+					HttpHeaders headers = new HttpHeaders();
+					HttpEntity<String> request = new HttpEntity<String>(headers);
+					String url = Shouter_URL + path + "?phoneId=" + message.getID() + "&message=" + message.getMessage() + "&latitude=" + message.getLatitude() + "&longitude=" + message.getLongitude() + "&parentId=" + message.getParent(); 
+					response = REST.exchange(url, HttpMethod.POST, request, String.class);
+					delegate.onPostShoutReturn(ShouterAPI.this, response.getBody(), null);
+					
+				}catch(Exception e){
+					e.printStackTrace();
+					delegate.onPostShoutReturn(ShouterAPI.this, null, e);
+				}
+				
+			}
+		});
+	}
 	
 	
 	public void postComment(final Shout message){
@@ -99,9 +118,7 @@ public class ShouterAPI {
 				try{
 					HttpHeaders headers = new HttpHeaders();
 					HttpEntity<String> request = new HttpEntity<String>(headers);
-					//TODO: Need to seperate Location into long and lat
-					String url = Shouter_URL + path + "?phoneId=" + message.getID() + "&message=" + message.getMessage() + "&latitude=" + latitude + "&longitude=" + longitude + "&parentId=" + message.getParent(); 
-					//Post Entity to URL
+					String url = Shouter_URL + path + "?phoneId=" + message.getID() + "&message=" + message.getMessage() + "&latitude=" + message.getLatitude() + "&longitude=" + message.getLongitude() + "&parentId=" + message.getParent(); 
 					response = REST.exchange(url, HttpMethod.POST, request, String.class);
 					delegate.onPostShoutReturn(ShouterAPI.this, response.getBody(), null);
 					
@@ -112,4 +129,6 @@ public class ShouterAPI {
 				
 			}
 		});
+	}
+}
 

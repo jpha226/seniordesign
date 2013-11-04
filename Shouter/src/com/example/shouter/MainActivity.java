@@ -3,36 +3,29 @@ package com.example.shouter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+//import android.R;
+//import android.R.id;
+//import android.R.menu;
+import android.app.Activity;
+import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+
+import com.example.shouter.util.ShouterAPIDelegate;
 //import com.google.android.gms.common.ConnectionResult;
 //import com.google.android.gms.common.GooglePlayServicesClient;
 //import com.google.android.gms.common.GooglePlayServicesUtil;
 //import com.google.android.gms.location.LocationClient;
 
 
-import com.google.android.gms.location.LocationListener;
-
-import android.annotation.SuppressLint;
-//import android.R;
-//import android.R.id;
-//import android.R.menu;
-import android.app.Activity;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.content.Intent;
-import android.location.Location;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.Toast;
-
-
-public class MainActivity extends Activity{// implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
+public class MainActivity extends Activity implements ShouterAPIDelegate{// implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
 
 	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE";
 	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;

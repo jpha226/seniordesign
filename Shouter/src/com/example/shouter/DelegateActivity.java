@@ -63,8 +63,7 @@ public class DelegateActivity extends MainActivity implements ShouterAPIDelegate
 				if(e != null)
 					Toast.makeText(DelegateActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
 				else
-				//Post Shout Success Logic
-				//Return logic not that important, if not error should return shout
+					((TextView) findViewById(R.id.text)).setText("post succesful");
 			}
 		});
 	}
