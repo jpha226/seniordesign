@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.os.Bundle;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.resttemplate.R;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
 
@@ -95,8 +97,7 @@ public class DelegateActivity extends MainActivity implements ShouterAPIDelegate
 				if(e != null)
 					Toast.makeText(DelegateActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
 				else
-				//Post Comment Success Logic
-				//same as post shout
+					((TextView) findViewById(R.id.text)).setText("post succesful");
 			}
 		});
 	}
