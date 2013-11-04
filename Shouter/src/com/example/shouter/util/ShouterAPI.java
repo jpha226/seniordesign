@@ -2,20 +2,21 @@
 package com.example.shouter.util;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import com.androidtools.Networking;
 import com.example.shouter.Shout;
-
 
 
 public class ShouterAPI {
@@ -25,10 +26,8 @@ public class ShouterAPI {
 	private ExecutorService executor;
 	private ShouterAPIDelegate delegate;
 	private RestTemplate REST = Networking.defaultRest();
-
-	private String shoutString;
-
 	private String path;
+	final List<Shout> shoutList = new ArrayList<Shout>();
 	
 	public ShouterAPI() {
 		executor = Executors.newFixedThreadPool(5);
@@ -50,10 +49,10 @@ public class ShouterAPI {
 			public void run() {
 				ResponseEntity<String> response = null;
 				try{
-					//TODO: Need to tweak to suit our API better
+					HttpHeaders headers = new HttpHeaders();
+					HttpEntity<String> request = new HttpEntity<String>(headers);
+					//TODO: Need to seperate Location into long and lat
 					String url = Shouter_URL + path + "?phoneId=" + message.getID() + "&message=" + message.getMessage() + "&latitude=" + latitude + "&longitude=" + longitude + "&parentId=" + message.getParent(); 
-					//Creates Entity with shout as body
-					HttpEntity<String> request = new HttpEntity<String>(shoutString);
 					//Post Entity to URL
 					response = REST.exchange(url, HttpMethod.POST, request, String.class);
 					delegate.onPostShoutReturn(ShouterAPI.this, response.getBody(), null);
@@ -67,52 +66,50 @@ public class ShouterAPI {
 		});
 	}
 	
-	public void getShout(final String Location){
+	public List<Shout> getShout(final String Location){
 			path = "/api/shout/search";
-			
 			executor.submit(new Runnable() {
 				@Override
 				public void run() {
 					ResponseEntity<String> response = null;
 					try {
-						HttpEntity<String> request = new HttpEntity<String>();
+						HttpHeaders headers = new HttpHeaders();
+						HttpEntity<String> request = new HttpEntity<String>(headers);
 						String url = Shouter_URL + path + "?latitute=" + latitude + "&longitude=" + longitude;
 						response = REST.exchange(url, HttpMethod.GET, request, String.class);
-						delegate.onGetShoutReturn(ShouterAPI.this, response.getBody(), null);
+						shoutList = delegate.onGetShoutReturn(ShouterAPI.this, response.getBody(), null);
 					} catch(Exception e) {
 						e.printStackTrace();
 						delegate.onGetShoutReturn(ShouterAPI.this, null, e);
 					}
 				}
 			});
+			return shoutList;
 	}
 		
 	
 	
 	public void postComment(final Shout message){
-
-	}
-	
-	public void getComment(final String parentId){
-		path = "/api/shout/comment/search";
+		path = "/api/shout/comment/create";
 		
-		executor.submit(new Runnable() {
+		executor.submit(new Runnable(){
 			@Override
 			public void run() {
 				ResponseEntity<String> response = null;
-				try {
-					HttpEntity<String> request = new HttpEntity<String>();
+				try{
+					HttpHeaders headers = new HttpHeaders();
+					HttpEntity<String> request = new HttpEntity<String>(headers);
+					//TODO: Need to seperate Location into long and lat
+					String url = Shouter_URL + path + "?phoneId=" + message.getID() + "&message=" + message.getMessage() + "&latitude=" + latitude + "&longitude=" + longitude + "&parentId=" + message.getParent(); 
+					//Post Entity to URL
+					response = REST.exchange(url, HttpMethod.POST, request, String.class);
+					delegate.onPostShoutReturn(ShouterAPI.this, response.getBody(), null);
 					
-					String url = Shouter_URL + path + "?parentId=" + parentId;
-					response = REST.exchange(url, HttpMethod.GET, request, String.class);
-					delegate.onGetCommentReturn(ShouterAPI.this, response.getBody(), null);
-				} catch(Exception e) {
+				}catch(Exception e){
 					e.printStackTrace();
-					delegate.onGetCommentReturn(ShouterAPI.this, null, e);
+					delegate.onPostShoutReturn(ShouterAPI.this, null, e);
 				}
+				
 			}
-		});			
-	}
-	
-}
+		});
 
