@@ -35,7 +35,8 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	private static Location location;
 	List<Shout> shoutList = new ArrayList<Shout>();
 	private ShouterAPI api;
-	
+	/* Dialogs */
+	public static final int DIALOG_LOADING = 0;
 	
 	
 	@Override
@@ -107,9 +108,12 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		
 		updateLocation();
 		
-		ArrayList<Shout> newShouts = new ArrayList<Shout>();
+		List<Shout> newShouts = new ArrayList<Shout>();
 		
-		newShouts = api.getShout();
+		String lat = "" + location.getLatitude();
+		String lon = "" + location.getLongitude();
+		
+		newShouts = api.getShout(lat, lon);
 		
 		
 		for(Shout s : newShouts){
