@@ -27,6 +27,23 @@ public class ShouterAPI {
 	private ShouterAPIDelegate delegate;
 	private RestTemplate REST = Networking.defaultRest();
 	private String path;
+<<<<<<< HEAD
+	final List<Shout> shoutList = new ArrayList<Shout>();
+	
+	public ShouterAPI() {
+		executor = Executors.newFixedThreadPool(5);
+	}
+	
+	public void setDelegate(ShouterAPIDelegate d){
+		delegate = d;
+	}
+	
+	public void register(String phoneID, String userName){
+		
+	}
+	
+	public void postShout(final Shout message) throws JsonGenerationException, JsonMappingException, IOException{
+=======
 	List<Shout> shoutList = new ArrayList<Shout>();
 	
 	public ShouterAPI() {
@@ -42,6 +59,7 @@ public class ShouterAPI {
 	}
 	
 	public void postShout(final Shout message) throws JsonGenerationException, JsonMappingException, IOException{
+>>>>>>> branch 'master' of https://github.com/jpha226/seniordesign.git
 		path = "/api/shout/create";
 		
 		executor.submit(new Runnable(){
@@ -50,6 +68,31 @@ public class ShouterAPI {
 				ResponseEntity<String> response = null;
 				try{
 					HttpHeaders headers = new HttpHeaders();
+<<<<<<< HEAD
+					HttpEntity<String> request = new HttpEntity<String>(headers);
+					//TODO: Need to seperate Location into long and lat
+					String url = Shouter_URL + path + "?phoneId=" + message.getID() + "&message=" + message.getMessage() + "&latitude=" + latitude + "&longitude=" + longitude + "&parentId=" + message.getParent(); 
+					//Post Entity to URL
+					response = REST.exchange(url, HttpMethod.POST, request, String.class);
+					delegate.onPostShoutReturn(ShouterAPI.this, response.getBody(), null);
+					
+				}catch(Exception e){
+					e.printStackTrace();
+					delegate.onPostShoutReturn(ShouterAPI.this, null, e);
+				}
+				
+			}
+		});
+	}
+	
+	public List<Shout> getShout(final String Location){
+			path = "/api/shout/search";
+			executor.submit(new Runnable() {
+				@Override
+				public void run() {
+					ResponseEntity<String> response = null;
+					try {
+=======
 					HttpEntity<String> request = new HttpEntity<String>(headers);
 					String url = Shouter_URL + path + "?phoneId=" + message.getID() + "&message=" + message.getMessage() + "&latitude=" + message.getLatitude() + "&longitude=" + message.getLongitude() + "&parentId=" + message.getParent(); 
 					response = REST.exchange(url, HttpMethod.POST, request, String.class);
@@ -71,6 +114,7 @@ public class ShouterAPI {
 				public void run() {
 					ResponseEntity<String> response = null;
 					try {
+>>>>>>> branch 'master' of https://github.com/jpha226/seniordesign.git
 						HttpHeaders headers = new HttpHeaders();
 						HttpEntity<String> request = new HttpEntity<String>(headers);
 						String url = Shouter_URL + path + "?latitute=" + latitude + "&longitude=" + longitude;
@@ -82,6 +126,14 @@ public class ShouterAPI {
 					}
 				}
 			});
+<<<<<<< HEAD
+			return shoutList;
+	}
+		
+	
+	
+	public void postComment(final Shout message){
+=======
 			return shoutList;
 	}
 		
@@ -109,6 +161,7 @@ public class ShouterAPI {
 	
 	
 	public void postComment(final Shout message){
+>>>>>>> branch 'master' of https://github.com/jpha226/seniordesign.git
 		path = "/api/shout/comment/create";
 		
 		executor.submit(new Runnable(){
@@ -129,6 +182,9 @@ public class ShouterAPI {
 				
 			}
 		});
+<<<<<<< HEAD
+=======
 	}
 }
+>>>>>>> branch 'master' of https://github.com/jpha226/seniordesign.git
 

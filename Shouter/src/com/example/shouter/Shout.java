@@ -5,16 +5,28 @@ import android.location.*;
 
 public class Shout {
 
-	private String message, id, userID, parentID;
+	private String message, id, latitude, longitude, userID, parentID;
 	private Timestamp time_stamp;
-	private Location location_stamp;
 	
 	
 	// Constructor
-	public Shout(String m, Location loc){}
+	public Shout(String m, Location loc){
+		
+		message = m;
+		latitude = "" + loc.getLatitude();
+		longitude = "" + loc.getLongitude();
+		
+	}
 	
 	// Constructor for comment
-	public Shout(String m, Location loc, String p){}
+	public Shout(String m, Location loc, String p){
+		
+		message = m;
+		id = p;
+		latitude = "" + loc.getLatitude();
+		longitude = "" + loc.getLongitude();		
+		
+	}
 	
 	// Accessor functions
 	public String getMessage(){return message;}
@@ -25,7 +37,9 @@ public class Shout {
 	
 	public String getParent(){return parentID;}
 	
-	public Location getLocation(){return location_stamp;}
+	public String getLatitude(){return latitude;}
+	
+	public String getLongitude(){return longitude;}
 	
 	public Timestamp getTime(){return time_stamp;}
 	
@@ -38,8 +52,6 @@ public class Shout {
 	public void setUser(String user){userID = user;}
 	
 	public void setParent(String p){parentID = p;}
-	
-	public void setLocation(Location loc){location_stamp = loc;}
 	
 	public void setTime(Timestamp time){time_stamp = time;}
 
