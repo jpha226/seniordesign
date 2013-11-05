@@ -13,9 +13,14 @@ public class Shout {
 	public Shout(String m, Location loc){
 		
 		message = m;
-		latitude = "" + loc.getLatitude();
-		longitude = "" + loc.getLongitude();
 		
+		latitude = "";
+		longitude = "";
+		
+		if(loc != null){
+			latitude +=  loc.getLatitude();
+			longitude += loc.getLongitude();
+		}
 	}
 	
 	// Constructor for comment

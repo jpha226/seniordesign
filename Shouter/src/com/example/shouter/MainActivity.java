@@ -4,19 +4,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+
 import com.example.shouter.util.ShouterAPIDelegate;
+
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+
 import com.example.shouter.util.ShouterAPI;
 import com.google.android.gms.location.LocationListener;
+
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -44,12 +50,10 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		
-		
-		
 		initList();
+		
 		ListView lv = (ListView) findViewById(R.id.ListView);
-		ListAdapter adapter = new ListAdapter(this, shoutList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
+		ListAdapter adapter = new ListAdapter(this, shoutList,android.R.layout.simple_list_item_1, new String[]{"shout"},new int[]{R.id.ListView});
 		
 		lv.setAdapter(adapter);
 	
@@ -110,8 +114,15 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		
 		List<Shout> newShouts = new ArrayList<Shout>();
 		
-		String lat = "" + location.getLatitude();
-		String lon = "" + location.getLongitude();
+		String lat = ""; 
+		String lon = ""; 
+		
+		if(location != null){
+			
+			lat += location.getLatitude();
+			lon += location.getLongitude();
+			
+		}
 		
 		newShouts = api.getShout(lat, lon);
 		

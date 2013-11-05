@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.resttemplate.R;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
 
@@ -24,7 +23,7 @@ public class DelegateActivity extends MainActivity implements ShouterAPIDelegate
         api.setDelegate(this);
         
         showDialog(DIALOG_LOADING);
-        api.postShout(shout);
+        //api.postShout(shout);
     }
 
     /**
@@ -42,7 +41,7 @@ public class DelegateActivity extends MainActivity implements ShouterAPIDelegate
 		        
 				if(e != null)
 					Toast.makeText(DelegateActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
-				else
+				
 					
 				//Get Shout Success Logic
 				//Get Json of shouts
@@ -62,8 +61,8 @@ public class DelegateActivity extends MainActivity implements ShouterAPIDelegate
 		        
 				if(e != null)
 					Toast.makeText(DelegateActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
-				else
-					((TextView) findViewById(R.id.text)).setText("post succesful");
+				//else
+					//((TextView) findViewById(R.id.text)).setText("post succesful");
 			}
 		});
 	}
@@ -78,7 +77,7 @@ public class DelegateActivity extends MainActivity implements ShouterAPIDelegate
 		        
 				if(e != null)
 					Toast.makeText(DelegateActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
-				else
+				//else
 				//Get Comment Success Logic
 				//Same as get shout 
 			}
@@ -95,8 +94,8 @@ public class DelegateActivity extends MainActivity implements ShouterAPIDelegate
 		        
 				if(e != null)
 					Toast.makeText(DelegateActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
-				else
-					((TextView) findViewById(R.id.text)).setText("post succesful");
+				//else
+					//((TextView) findViewById(R.id.text)).setText("post succesful");
 			}
 		});
 	}

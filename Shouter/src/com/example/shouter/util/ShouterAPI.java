@@ -28,23 +28,9 @@ public class ShouterAPI {
 	private RestTemplate REST = Networking.defaultRest();
 	private String path;
 
-	final List<Shout> shoutList = new ArrayList<Shout>();
-	
-	public ShouterAPI() {
-		executor = Executors.newFixedThreadPool(5);
-	}
-	
-	public void setDelegate(ShouterAPIDelegate d){
-		delegate = d;
-	}
-	
-	public void register(String phoneID, String userName){
-		
-	}
-	
-	public void postShout(final Shout message) throws JsonGenerationException, JsonMappingException, IOException{
-
 	List<Shout> shoutList = new ArrayList<Shout>();
+	
+	
 	
 	public ShouterAPI() {
 		executor = Executors.newFixedThreadPool(5);
@@ -71,30 +57,8 @@ public class ShouterAPI {
 
 					HttpEntity<String> request = new HttpEntity<String>(headers);
 					//TODO: Need to seperate Location into long and lat
-					String url = Shouter_URL + path + "?phoneId=" + message.getID() + "&message=" + message.getMessage() + "&latitude=" + latitude + "&longitude=" + longitude + "&parentId=" + message.getParent(); 
-					//Post Entity to URL
-					response = REST.exchange(url, HttpMethod.POST, request, String.class);
-					delegate.onPostShoutReturn(ShouterAPI.this, response.getBody(), null);
-					
-				}catch(Exception e){
-					e.printStackTrace();
-					delegate.onPostShoutReturn(ShouterAPI.this, null, e);
-				}
-				
-			}
-		});
-	}
-	
-	public List<Shout> getShout(final String Location){
-			path = "/api/shout/search";
-			executor.submit(new Runnable() {
-				@Override
-				public void run() {
-					ResponseEntity<String> response = null;
-					try {
-
-					HttpEntity<String> request = new HttpEntity<String>(headers);
 					String url = Shouter_URL + path + "?phoneId=" + message.getID() + "&message=" + message.getMessage() + "&latitude=" + message.getLatitude() + "&longitude=" + message.getLongitude() + "&parentId=" + message.getParent(); 
+					//Post Entity to URL
 					response = REST.exchange(url, HttpMethod.POST, request, String.class);
 					delegate.onPostShoutReturn(ShouterAPI.this, response.getBody(), null);
 					
@@ -130,12 +94,6 @@ public class ShouterAPI {
 			return shoutList;
 	}
 		
-	
-	
-	public void postComment(final Shout message){
-
-			return shoutList;
-	}
 		
 	public void postComment(final Shout message) throws JsonGenerationException, JsonMappingException, IOException{
 		path = "/api/shout/comment/create";
@@ -159,32 +117,7 @@ public class ShouterAPI {
 		});
 	}
 	
-	
-	public void postComment(final Shout message){
 
-		path = "/api/shout/comment/create";
-		
-		executor.submit(new Runnable(){
-			@Override
-			public void run() {
-				ResponseEntity<String> response = null;
-				try{
-					HttpHeaders headers = new HttpHeaders();
-					HttpEntity<String> request = new HttpEntity<String>(headers);
-					String url = Shouter_URL + path + "?phoneId=" + message.getID() + "&message=" + message.getMessage() + "&latitude=" + message.getLatitude() + "&longitude=" + message.getLongitude() + "&parentId=" + message.getParent(); 
-					response = REST.exchange(url, HttpMethod.POST, request, String.class);
-					delegate.onPostShoutReturn(ShouterAPI.this, response.getBody(), null);
-					
-				}catch(Exception e){
-					e.printStackTrace();
-					delegate.onPostShoutReturn(ShouterAPI.this, null, e);
-				}
-				
-			}
-		});
-
-
-	}
 }
 
 
