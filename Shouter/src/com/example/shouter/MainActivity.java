@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -18,6 +20,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.example.shouter.util.ShouterAPI;
@@ -33,10 +36,11 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	private static final int GPS_RESOLUTION = 1;
 	private UserLocation userLocation;
 	private static Location location;
-	List<Shout> shoutList = new ArrayList<Shout>();
+	List<Map<String,Shout>> shoutList = new ArrayList<Map<String,Shout>>();
 	private ShouterAPI api;
 	/* Dialogs */
 	public static final int DIALOG_LOADING = 0;
+	
 	
 	@Override
     protected Dialog onCreateDialog(int id) {
@@ -60,10 +64,10 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		initList();
 		
 		ListView lv = (ListView) findViewById(R.id.ListView);
-		ListAdapter adapter = new ListAdapter(this, shoutList,android.R.layout.simple_list_item_1, new String[]{"shout"},new int[]{R.id.ListView});
-		
+		//ListAdapter adapter = new ListAdapter(this, shoutList,android.R.layout.simple_list_item_1, new String[]{"shout"},new int[]{R.id.ListView});
+		SimpleAdapter adapter = new SimpleAdapter(this, shoutList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{R.id.ListView});
 		lv.setAdapter(adapter);
-	
+		
 		api = new ShouterAPI();
         api.setDelegate(this);
 		
@@ -137,7 +141,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		
 		for(Shout s : newShouts){
 			
-			shoutList.add(s);
+			shoutList.add(createShout("Item new", s));
 			
 		}
 		
@@ -145,22 +149,22 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	
 	private void initList(){
 		
-		shoutList.add(new Shout("Test Shout 1",null));
-		shoutList.add(new Shout("Just making sure this App is working",null));
-		shoutList.add(new Shout("Woot Shouter",null));
-		shoutList.add(new Shout("Still working",null));
-		shoutList.add(new Shout("Test Shout 5",null));
-		shoutList.add(new Shout("Test Shout 6",null));
-		shoutList.add(new Shout("Test Shout 7",null));
+		shoutList.add(createShout("Item 1", new Shout("Test Shout 1",null)));
+		shoutList.add(createShout("Item 2", new Shout("Just making sure this App is working",null)));
+		shoutList.add(createShout("Item 3", new Shout("Woot Shouter",null)));
+		shoutList.add(createShout("Item 4", new Shout("Still working",null)));
+		shoutList.add(createShout("Item 5", new Shout("Test Shout 5",null)));
+		shoutList.add(createShout("Item 6", new Shout("Test Shout 6",null)));
+		shoutList.add(createShout("Item 7", new Shout("Test Shout 7",null)));
 		
 	}
 
 //Use hashmaps to populate list. Can be expanded on once shout structure has been defined.
-	private HashMap<String, String> createShout(String name, String message){
+	private HashMap<String, Shout> createShout(String name, Shout shout){
 		
-		HashMap<String, String> shout = new HashMap<String, String>();
-		shout.put(name, message);
-		return shout;
+		HashMap<String, Shout> item = new HashMap<String, Shout>();
+		item.put(name, shout);
+		return item;
 		
 	}
 

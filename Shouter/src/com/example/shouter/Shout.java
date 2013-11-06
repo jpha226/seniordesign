@@ -60,4 +60,6 @@ public class Shout {
 	
 	public void setTime(Timestamp time){time_stamp = time;}
 
+	public String toString(){return message;}
+	
 }
