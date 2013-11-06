@@ -2,12 +2,17 @@ package com.example.shouter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.type.TypeFactory;
+import org.codehaus.jackson.type.TypeReference;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -212,11 +217,14 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				if(e != null)
 					Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
 				else{
+					List<Shout> shoutList = new ArrayList<Shout>();
+					ObjectMapper mapper = new ObjectMapper();
+					try {
+						shoutList = mapper.readValue(result, new TypeReference<List<Shout>>(){});
+					} catch (Exception e1) {
+						e1.printStackTrace(); }
+					Collections.reverse(shoutList);
 					Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
-				//Get Shout Success Logic
-				//Get Json of shouts
-				//Needs to convert to list of shouts
-				//Possible need a custom comparator
 			}
 		}});
 		return shoutList;
@@ -278,6 +286,9 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		});
 	}
 
+	public List<Shout> convert(String source){
+		ObjectMapper mapper = new 
+	}
 	
 	
 }
