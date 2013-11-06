@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -15,17 +14,18 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
-import com.google.android.gms.location.LocationListener;
 
 
 
@@ -207,7 +207,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				if(e != null)
 					Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
 				else{
-					
+					Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
 				//Get Shout Success Logic
 				//Get Json of shouts
 				//Needs to convert to list of shouts
@@ -227,6 +227,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				if(e != null)
 					Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
 				else{
+					Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
 				//Post Shout Success Logic
 				//Return logic not that important, if not error should return shout
 				}
@@ -245,6 +246,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				if(e != null)
 					Toast.makeText(MainActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
 				else{
+					Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
 				//Get Comment Success Logic
 				//Same as get shout 
 				}
@@ -263,6 +265,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				if(e != null)
 					Toast.makeText(MainActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
 				else{
+					Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
 				//Post Comment Success Logic
 				//same as post shout
 				}
