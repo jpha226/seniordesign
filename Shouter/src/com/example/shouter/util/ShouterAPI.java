@@ -15,7 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import com.androidtools.Networking;
+import com.androidtools.networking.Networking;
 import com.example.shouter.Shout;
 
 
