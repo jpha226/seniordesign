@@ -5,30 +5,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-
-import com.example.shouter.util.ShouterAPIDelegate;
-
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
+import android.widget.Toast;
 
 import com.example.shouter.util.ShouterAPI;
+import com.example.shouter.util.ShouterAPIDelegate;
 import com.google.android.gms.location.LocationListener;
-
-import android.annotation.SuppressLint;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.util.Log;
-import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
 
 
@@ -43,6 +37,19 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	private ShouterAPI api;
 	/* Dialogs */
 	public static final int DIALOG_LOADING = 0;
+	
+	@Override
+    protected Dialog onCreateDialog(int id) {
+		ProgressDialog dialog = null;
+        switch (id) {
+        case DIALOG_LOADING:
+        	dialog = new ProgressDialog(this);
+        	((ProgressDialog) dialog).setMessage(getString(R.string.loading));        	
+        	((ProgressDialog) dialog).setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        	break;
+        }
+        return dialog;
+	}
 	
 	
 	@Override
@@ -96,7 +103,8 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		Shout myShout = new Shout(message, location);
 		
 		try {
-			
+
+	        showDialog(DIALOG_LOADING);
 			api.postShout(myShout);
 			
 		} catch (JsonGenerationException e) {e.printStackTrace();} catch (JsonMappingException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();}
@@ -193,7 +201,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 					dismissDialog(DIALOG_LOADING);
 		        
 				if(e != null)
-					Toast.makeText(MainActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
+					Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
 				else{
 					
 				//Get Shout Success Logic
@@ -213,7 +221,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 					dismissDialog(DIALOG_LOADING);
 		        
 				if(e != null)
-					Toast.makeText(MainActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
+					Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
 				else{
 				//Post Shout Success Logic
 				//Return logic not that important, if not error should return shout
