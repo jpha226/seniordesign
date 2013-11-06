@@ -28,9 +28,10 @@ public class Shout {
 		
 		message = m;
 		id = p;
-		latitude = "" + loc.getLatitude();
-		longitude = "" + loc.getLongitude();		
-		
+		if(loc != null){
+			latitude = "" + loc.getLatitude();
+			longitude = "" + loc.getLongitude();		
+		}
 	}
 	
 	// Accessor functions
@@ -59,7 +60,11 @@ public class Shout {
 	public void setParent(String p){parentID = p;}
 	
 	public void setTime(Timestamp time){time_stamp = time;}
-
+	
+	public void setLatitude(double l){latitude = "" + l;}
+	
+	public void setLongitude(double l){longitude = "" + l;}
+	
 	public String toString(){return message;}
 	
 }

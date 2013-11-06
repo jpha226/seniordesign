@@ -14,7 +14,6 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -27,6 +26,7 @@ import android.widget.Toast;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
 
+import com.google.android.gms.location.LocationListener;
 
 
 public class MainActivity extends Activity implements ShouterAPIDelegate{// implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
@@ -36,7 +36,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	private static final int GPS_RESOLUTION = 1;
 	private UserLocation userLocation;
 	private static Location location;
-	List<Map<String,Shout>> shoutList = new ArrayList<Map<String,Shout>>();
+	List<Map<String,String>> shoutList = new ArrayList<Map<String,String>>();
 	private ShouterAPI api;
 	/* Dialogs */
 	public static final int DIALOG_LOADING = 0;
@@ -95,20 +95,23 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		
 		updateLocation();
 		
-		if(location != null)
-			message = location.getLongitude()+", "+location.getLatitude();
-		else
-			message = "null";
-		
 		intent.putExtra(EXTRA_MESSAGE, message);
 		startActivity(intent);
 		
 		
 		Shout myShout = new Shout(message, location);
 		
+		
 		try {
-
-	        showDialog(DIALOG_LOADING);
+			
+			if(location == null){
+				myShout.setLatitude(50.0);
+				myShout.setLongitude(50.0);
+				myShout.setID("999999");
+				myShout.setParent("999998");
+			}
+			
+			showDialog(DIALOG_LOADING);
 			api.postShout(myShout);
 			
 		} catch (JsonGenerationException e) {e.printStackTrace();} catch (JsonMappingException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();}
@@ -116,6 +119,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		refresh(view); // automatically refresh after posting message
 		
 	}
+	
 	
 	/* This function will pull shouts from the database and update displayed shouts
 	 * 
@@ -160,10 +164,10 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	}
 
 //Use hashmaps to populate list. Can be expanded on once shout structure has been defined.
-	private HashMap<String, Shout> createShout(String name, Shout shout){
+	private HashMap<String, String> createShout(String name, Shout shout){
 		
-		HashMap<String, Shout> item = new HashMap<String, Shout>();
-		item.put(name, shout);
+		HashMap<String, String> item = new HashMap<String, String>();
+		item.put(name, shout.toString());
 		return item;
 		
 	}
@@ -186,7 +190,9 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 					
 				}
 				
-			}});
+			}
+
+			});
 		
 		
 	}
