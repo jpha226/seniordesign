@@ -18,7 +18,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.view.Menu;
 import android.view.View;
@@ -33,7 +32,7 @@ import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
 import com.google.android.gms.location.LocationListener;
 
-
+@SuppressWarnings("deprecation")
 public class MainActivity extends Activity implements ShouterAPIDelegate{// implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
 
 	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE";
@@ -129,8 +128,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		
 		
 		Shout myShout = new Shout(message, location);
-		String android_id = Secure.getString(this.getContentResolver(),
-                Secure.ANDROID_ID); 
+		String android_id = Secure.getString(this.getContentResolver(),Secure.ANDROID_ID); 
 		myShout.setID(android_id);
 		
 		try {

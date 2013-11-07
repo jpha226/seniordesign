@@ -37,7 +37,7 @@
                 android:value="com.example.shouter.MainActivity" />
         </activity>
         <activity
-            android:name="com.example.shouter.CommentActivity1"
+            android:name="com.example.shouter.CommentActivity"
             android:label="@string/title_activity_comment"
             android:parentActivityName="com.example.shouter.MainActivity" >
             <meta-data
