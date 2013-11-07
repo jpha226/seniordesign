@@ -2,17 +2,12 @@ package com.example.shouter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.type.TypeFactory;
-import org.codehaus.jackson.type.TypeReference;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -22,12 +17,13 @@ import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidtools.UserLocation;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
 import com.google.android.gms.location.LocationListener;
@@ -44,7 +40,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	private ShouterAPI api;
 	/* Dialogs */
 	public static final int DIALOG_LOADING = 0;
-	
+	private ListView lv;
 	
 	@Override
     protected Dialog onCreateDialog(int id) {
@@ -65,12 +61,37 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		
 		initList();
 		
-		ListView lv = (ListView) findViewById(R.id.ListView);
-		//ListAdapter adapter = new ListAdapter(this, shoutList,android.R.layout.simple_list_item_1, new String[]{"shout"},new int[]{R.id.ListView});
-		SimpleAdapter adapter = new SimpleAdapter(this, shoutList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{R.id.ListView});
+		lv = (ListView) findViewById(R.id.ListView);
+		
+		SimpleAdapter adapter = new SimpleAdapter(this, shoutList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
 		lv.setAdapter(adapter);
+		
+		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parentAdapter, View view, int position, long id) {
+				
+				// We know the View is a TextView so we can cast it
+				
+				TextView clickedView = (TextView) view;
+				Toast.makeText(MainActivity.this, "Item with id ["+id+"] - Position ["+position+"] - Shout ["+clickedView.getText()+"]", Toast.LENGTH_SHORT).show();
+				
+				Intent intent = new Intent(MainActivity.this, CommentActivity.class);
+				//EditText editText = (EditText) findViewById(R.id.edit_message);
+				String message = (String) clickedView.getText();
+				
+				updateLocation();
+				
+				intent.putExtra(EXTRA_MESSAGE, message);
+				startActivity(intent);
+				
+				
+			}
+			
+		});
 		
 		api = new ShouterAPI();
         api.setDelegate(this);
@@ -81,8 +102,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
-		//myClient = new LocationClient(this, this, this);
-		//myClient.connect();
+		
 		return true;
 	}
 	
@@ -144,12 +164,13 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 			
 		}
 		
+		showDialog(DIALOG_LOADING);
 		newShouts = api.getShout(lat, lon);
 		
 		
 		for(Shout s : newShouts){
 			
-			shoutList.add(createShout("Item new", s));
+			shoutList.add(createShout("shout", s));
 			
 		}
 		
@@ -157,13 +178,13 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	
 	private void initList(){
 		
-		shoutList.add(createShout("Item 1", new Shout("Test Shout 1",null)));
-		shoutList.add(createShout("Item 2", new Shout("Just making sure this App is working",null)));
-		shoutList.add(createShout("Item 3", new Shout("Woot Shouter",null)));
-		shoutList.add(createShout("Item 4", new Shout("Still working",null)));
-		shoutList.add(createShout("Item 5", new Shout("Test Shout 5",null)));
-		shoutList.add(createShout("Item 6", new Shout("Test Shout 6",null)));
-		shoutList.add(createShout("Item 7", new Shout("Test Shout 7",null)));
+		shoutList.add(createShout("shout", new Shout("Test Shout 1",null)));
+		shoutList.add(createShout("shout", new Shout("Just making sure this App is working",null)));
+		shoutList.add(createShout("shout", new Shout("Woot Shouter",null)));
+		shoutList.add(createShout("shout", new Shout("Still working",null)));
+		shoutList.add(createShout("shout", new Shout("Test Shout 5",null)));
+		shoutList.add(createShout("shout", new Shout("Test Shout 6",null)));
+		shoutList.add(createShout("shout", new Shout("Test Shout 7",null)));
 		
 	}
 
@@ -217,14 +238,11 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				if(e != null)
 					Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
 				else{
-					List<Shout> shoutList = new ArrayList<Shout>();
-					ObjectMapper mapper = new ObjectMapper();
-					try {
-						shoutList = mapper.readValue(result, new TypeReference<List<Shout>>(){});
-					} catch (Exception e1) {
-						e1.printStackTrace(); }
-					Collections.reverse(shoutList);
 					Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
+				//Get Shout Success Logic
+				//Get Json of shouts
+				//Needs to convert to list of shouts
+				//Possible need a custom comparator
 			}
 		}});
 		return shoutList;
@@ -286,9 +304,6 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		});
 	}
 
-	public List<Shout> convert(String source){
-		ObjectMapper mapper = new 
-	}
 	
 	
 }
