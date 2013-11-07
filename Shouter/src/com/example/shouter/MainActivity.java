@@ -82,7 +82,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				TextView clickedView = (TextView) view;
 				Toast.makeText(MainActivity.this, "Item with id ["+id+"] - Position ["+position+"] - Shout ["+clickedView.getText()+"]", Toast.LENGTH_SHORT).show();
 				
-				Intent intent = new Intent(MainActivity.this, CommentActivity.class);
+				Intent intent = new Intent(MainActivity.this, CommentActivity1.class);
 				//EditText editText = (EditText) findViewById(R.id.edit_message);
 				String message = (String) clickedView.getText();
 				

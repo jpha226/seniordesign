@@ -11,5 +11,6 @@
     <string name="title_activity_display_message">MyMessage</string>
     <string name="loading">loading&#8230;</string>
     <string name="title_activity_comment">CommentActivity</string>
+    <string name="title_activity_com">ComActivity</string>
 
 </resources>
