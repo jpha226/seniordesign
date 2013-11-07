@@ -1,7 +1,8 @@
 package com.example.shouter;
 
 import java.sql.Timestamp;
-import android.location.*;
+
+import android.location.Location;
 
 public class Shout {
 

@@ -1,4 +1,5 @@
 
+
 package com.example.shouter.util;
 
 import java.io.IOException;
@@ -15,10 +16,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import com.androidtools.Networking;
+import com.androidtools.networking.Networking;
 import com.example.shouter.Shout;
 
-
+/**
+ * 
+ * @author Craig
+ * Wrapper for the API that accesses Shouter
+ *
+ */
 public class ShouterAPI {
 
 	private static final String Shouter_URL = "http://shouterapi-env.elasticbeanstalk.com/shouter";
@@ -31,19 +37,37 @@ public class ShouterAPI {
 	List<Shout> shoutList = new ArrayList<Shout>();
 	
 	
-	
+	/**
+	 * @author Craig
+	 * Constructor that creates threads
+	 */
 	public ShouterAPI() {
 		executor = Executors.newFixedThreadPool(5);
 	}
 	
+	/**
+	 * @author Craig
+	 * @param delegate - The delegate from ShouterAPIDeleagate
+	 */
 	public void setDelegate(ShouterAPIDelegate d){
 		delegate = d;
 	}
 	
+	/**
+	 * @author Craig
+	 * @param phoneID - Unique ID for the users phone
+	 * @param userName - User defined userName to be linked with their ID
+	 * Not implemented yet, to come with phase 2
+	 */
 	public void register(String phoneID, String userName){
 		
 	}
 	
+	/**
+	 * @author Craig
+	 * @param message - Shout to be sent to the API 
+	 * COnverts shout to HTTP call and calls Shouter API
+	 */
 	public void postShout(final Shout message) throws JsonGenerationException, JsonMappingException, IOException{
 
 		path = "/api/shout/create";
@@ -70,7 +94,13 @@ public class ShouterAPI {
 			}
 		});
 	}
-	
+	/**
+	 * @author Craig
+	 * @param latitude - String of devices latitude
+	 * @param longitude - String of devices longitude
+	 * @return list of shouts that a within geagraphical boundry of current location
+	 * Function gets a list of shouts based on current location from the API
+	 */
 	public List<Shout> getShout(final String latitude, final String longitude){
 			path = "/api/shout/search";
 			executor.submit(new Runnable() { 
@@ -94,7 +124,12 @@ public class ShouterAPI {
 			return shoutList;
 	}
 		
-		
+	/**
+	 * @author Josiah
+	 * @param shout - The shout to be converted to JSON and pushed to the database
+	 * Function pushes shout to database
+	 * @return
+	 */	
 	public void postComment(final Shout message) throws JsonGenerationException, JsonMappingException, IOException{
 		path = "/api/shout/comment/create";
 		executor.submit(new Runnable(){
@@ -116,7 +151,12 @@ public class ShouterAPI {
 			}
 		});
 	}
-	
+	/**
+	 * @author Josiah
+	 * @param shout - The shout to be converted to JSON and pushed to the database
+	 * Function pushes shout to database
+	 * @return
+	 */
 	public List<Shout> getComment(final String parentId){
 		path = "/api/shout/search";
 		executor.submit(new Runnable() { 

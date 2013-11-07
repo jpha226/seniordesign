@@ -16,6 +16,7 @@ public class Utility {
 	 * @author Josiah
 	 * @param shout - The shout to be converted to JSON and pushed to the database
 	 * Function pushes shout to database
+	 * @return
 	 */
 	public static void post(Shout shout) {}
 	
