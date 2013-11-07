@@ -18,7 +18,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.view.Menu;
 import android.view.View;
@@ -33,7 +32,7 @@ import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
 import com.google.android.gms.location.LocationListener;
 
-
+@SuppressWarnings("deprecation")
 public class MainActivity extends Activity implements ShouterAPIDelegate{// implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
 
 	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE";
@@ -231,10 +230,15 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		
 	}
 
-	 /**
-     * We're not guaranteed that this is called on the UI thread.  Any changes to the
-     * UI will need to be done using runOnUiThread()
-     */
+	
+	/**
+	 * @author Craig
+	 * @param api - API wrapper used to make certain call to api
+	 * @param result - Return value from http call to api if success
+	 * @param e -  Return value from http call to api if failure
+	 * @return List of shouts from call to api for GetShout
+	 * Return logic for a call to the API for getShout
+	 */
 	@Override
 	public List<Shout> onGetShoutReturn(ShouterAPI api, final String result, final Exception e) {
 		final List<Shout> shoutList = new ArrayList<Shout>();
@@ -260,6 +264,13 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		return shoutList;
 	}
     
+	/**
+	 * @author Craig
+	 * @param api - API wrapper used to make certain call to api
+	 * @param result - Return value from http call to api if success
+	 * @param e -  Return value from http call to api if failure
+	 * Return logic for a call to the API for postShout
+	 */
 	public void onPostShoutReturn(ShouterAPI api, final String result, final Exception e) {
 		runOnUiThread(new Runnable() {
 			@Override
@@ -279,6 +290,14 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		});
 	}
 	
+	/**
+	 * @author Craig
+	 * @param api - API wrapper used to make certain call to api
+	 * @param result - Return value from http call to api if success
+	 * @param e -  Return value from http call to api if failure
+	 * @return List of shouts from call to api for getComment
+	 * Return logic for a call to the API for getComment
+	 */
 	public List<Shout> onGetCommentReturn(ShouterAPI api, final String result, final Exception e) {
 		final List<Shout> shoutList = new ArrayList<Shout>();
 		runOnUiThread(new Runnable() {
@@ -299,6 +318,13 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		return shoutList;
 	}
 	
+	/**
+	 * @author Craig
+	 * @param api - API wrapper used to make certain call to api
+	 * @param result - Return value from http call to api if success
+	 * @param e -  Return value from http call to api if failure
+	 * Return logic for a call to the API for postComment
+	 */
 	public void onPostCommentReturn(ShouterAPI api, final String result, final Exception e) {
 		runOnUiThread(new Runnable() {
 			@Override
