@@ -18,6 +18,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.provider.Settings.Secure;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -82,7 +84,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				TextView clickedView = (TextView) view;
 				Toast.makeText(MainActivity.this, "Item with id ["+id+"] - Position ["+position+"] - Shout ["+clickedView.getText()+"]", Toast.LENGTH_SHORT).show();
 				
-				Intent intent = new Intent(MainActivity.this, CommentActivity1.class);
+				Intent intent = new Intent(MainActivity.this, CommentActivity.class);
 				//EditText editText = (EditText) findViewById(R.id.edit_message);
 				String message = (String) clickedView.getText();
 				
@@ -127,16 +129,18 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		
 		
 		Shout myShout = new Shout(message, location);
-		
+		String android_id = Secure.getString(this.getContentResolver(),
+                Secure.ANDROID_ID); 
+		myShout.setID(android_id);
 		
 		try {
 			
-			if(location == null){
+			//if(location == null){
 				myShout.setLatitude(50.0);
 				myShout.setLongitude(50.0);
-				myShout.setID("999999");
+				//myShout.setID("999999");
 				myShout.setParent("999998");
-			}
+			//}
 			
 			showDialog(DIALOG_LOADING);
 			api.postShout(myShout);
@@ -159,18 +163,20 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		
 		String lat = ""; 
 		String lon = ""; 
+		//hardcoding for testing
+		lat = "50";
+		lon = "50";
 		
-		if(location != null){
+		//if(location != null){
 			
-			lat += location.getLatitude();
-			lon += location.getLongitude();
+		//	lat += location.getLatitude();
+		//	lon += location.getLongitude();
 			
-		}
+		//}
 		
 		showDialog(DIALOG_LOADING);
 		newShouts = api.getShout(lat, lon);
-		
-		
+
 		for(Shout s : newShouts){
 			
 			shoutList.add(createShout("shout", s));
@@ -248,7 +254,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 					}catch(Exception e1){
 						e1.printStackTrace();}
 					Collections.reverse(shoutList);
-					Toast.makeText(MainActivity.this, "Get Successful!!!", Toast.LENGTH_LONG);
+					Toast.makeText(MainActivity.this, "Get Successful!!!", Toast.LENGTH_LONG).show();
 			}
 		}});
 		return shoutList;
@@ -264,7 +270,8 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				if(e != null)
 					Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
 				else{
-					Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
+					Toast.makeText(MainActivity.this, "Post Shout Successful", Toast.LENGTH_LONG).show();
+					
 				//Post Shout Success Logic
 				//Return logic not that important, if not error should return shout
 				}
