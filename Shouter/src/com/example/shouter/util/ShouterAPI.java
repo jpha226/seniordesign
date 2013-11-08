@@ -110,7 +110,7 @@ public class ShouterAPI {
 
 						HttpHeaders headers = new HttpHeaders();
 						HttpEntity<String> request = new HttpEntity<String>(headers);
-						String url = Shouter_URL + path + "?latitute=" + latitude + "&longitude=" + longitude;
+						String url = Shouter_URL + path + "?latitude=" + latitude + "&longitude=" + longitude;
 						response = REST.exchange(url, HttpMethod.GET, request, String.class);
 						shoutList = delegate.onGetShoutReturn(ShouterAPI.this, response.getBody(), null);
 					} catch(Exception e) {
