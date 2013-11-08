@@ -65,7 +65,7 @@ public class ShouterAPI {
 	/**
 	 * @author Craig
 	 * @param message - Shout to be sent to the API 
-	 * COnverts shout to HTTP call and calls Shouter API
+	 * Converts shout to HTTP call and calls Shouter API
 	 */
 	public void postShout(final Shout message) throws JsonGenerationException, JsonMappingException, IOException{
 
@@ -110,7 +110,7 @@ public class ShouterAPI {
 
 						HttpHeaders headers = new HttpHeaders();
 						HttpEntity<String> request = new HttpEntity<String>(headers);
-						String url = Shouter_URL + path + "?latitute=" + latitude + "&longitude=" + longitude;
+						String url = Shouter_URL + path + "?latitude=" + latitude + "&longitude=" + longitude;
 						response = REST.exchange(url, HttpMethod.GET, request, String.class);
 						shoutList = delegate.onGetShoutReturn(ShouterAPI.this, response.getBody(), null);
 					} catch(Exception e) {
@@ -124,10 +124,9 @@ public class ShouterAPI {
 	}
 		
 	/**
-	 * @author Josiah
-	 * @param shout - The shout to be converted to JSON and pushed to the database
-	 * Function pushes shout to database
-	 * @return
+	 * @author Craig
+	 * @param message - Shout that is to be connected with parent shout
+	 * Function pushes shout back to API to store in database
 	 */	
 	public void postComment(final Shout message) throws JsonGenerationException, JsonMappingException, IOException{
 		path = "/api/shout/comment/create";
@@ -151,10 +150,10 @@ public class ShouterAPI {
 		});
 	}
 	/**
-	 * @author Josiah
-	 * @param shout - The shout to be converted to JSON and pushed to the database
-	 * Function pushes shout to database
-	 * @return
+	 * @author Craig
+	 * @param parentId
+	 * @return List of shouts associated with parentId shout
+	 * Function returns a list of shouts connected to the input parentId by querying the database through the API
 	 */
 	public List<Shout> getComment(final String parentId){
 		path = "/api/shout/search";

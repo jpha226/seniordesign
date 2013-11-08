@@ -67,6 +67,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		
 		
 		initList();
+		updateLocation();
 		
 		lv = (ListView) findViewById(R.id.ListView);
 		
@@ -130,12 +131,14 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		Shout myShout = new Shout(message, location);
 		String android_id = Secure.getString(this.getContentResolver(),Secure.ANDROID_ID); 
 		myShout.setID(android_id);
-		
+		String lon = myShout.getLongitude();
+		String lat = myShout.getLatitude();
+		Toast.makeText(MainActivity.this, "Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG).show();
 		try {
 			
 			//if(location == null){
-				myShout.setLatitude(50.0);
-				myShout.setLongitude(50.0);
+			//	myShout.setLatitude(50.0);
+			//	myShout.setLongitude(50.0);
 				//myShout.setID("999999");
 				myShout.setParent("999998");
 			//}
@@ -158,19 +161,14 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		updateLocation();
 		
 		List<Shout> newShouts = new ArrayList<Shout>();
+		String lat = "";
+		String lon = "";
 		
-		String lat = ""; 
-		String lon = ""; 
-		//hardcoding for testing
-		lat = "50";
-		lon = "50";
-		
-		//if(location != null){
+		if(location != null){
+			lat = Shout.convert(location.getLatitude());
+			lon = Shout.convert(location.getLongitude());
 			
-		//	lat += location.getLatitude();
-		//	lon += location.getLongitude();
-			
-		//}
+		}
 		
 		showDialog(DIALOG_LOADING);
 		newShouts = api.getShout(lat, lon);
@@ -229,10 +227,15 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		
 	}
 
-	 /**
-     * We're not guaranteed that this is called on the UI thread.  Any changes to the
-     * UI will need to be done using runOnUiThread()
-     */
+	
+	/**
+	 * @author Craig
+	 * @param api - API wrapper used to make certain call to api
+	 * @param result - Return value from http call to api if success
+	 * @param e -  Return value from http call to api if failure
+	 * @return List of shouts from call to api for GetShout
+	 * Return logic for a call to the API for getShout
+	 */
 	@Override
 	public List<Shout> onGetShoutReturn(ShouterAPI api, final String result, final Exception e) {
 		final List<Shout> shoutList = new ArrayList<Shout>();
@@ -252,12 +255,19 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 					}catch(Exception e1){
 						e1.printStackTrace();}
 					Collections.reverse(shoutList);
-					Toast.makeText(MainActivity.this, "Get Successful!!!", Toast.LENGTH_LONG).show();
+					Toast.makeText(MainActivity.this, "GET" + result, Toast.LENGTH_LONG).show();
 			}
 		}});
 		return shoutList;
 	}
     
+	/**
+	 * @author Craig
+	 * @param api - API wrapper used to make certain call to api
+	 * @param result - Return value from http call to api if success
+	 * @param e -  Return value from http call to api if failure
+	 * Return logic for a call to the API for postShout
+	 */
 	public void onPostShoutReturn(ShouterAPI api, final String result, final Exception e) {
 		runOnUiThread(new Runnable() {
 			@Override
@@ -268,7 +278,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				if(e != null)
 					Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
 				else{
-					Toast.makeText(MainActivity.this, "Post Shout Successful", Toast.LENGTH_LONG).show();
+					Toast.makeText(MainActivity.this, "POST" + result, Toast.LENGTH_LONG).show();
 					
 				//Post Shout Success Logic
 				//Return logic not that important, if not error should return shout
@@ -277,6 +287,14 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		});
 	}
 	
+	/**
+	 * @author Craig
+	 * @param api - API wrapper used to make certain call to api
+	 * @param result - Return value from http call to api if success
+	 * @param e -  Return value from http call to api if failure
+	 * @return List of shouts from call to api for getComment
+	 * Return logic for a call to the API for getComment
+	 */
 	public List<Shout> onGetCommentReturn(ShouterAPI api, final String result, final Exception e) {
 		final List<Shout> shoutList = new ArrayList<Shout>();
 		runOnUiThread(new Runnable() {
@@ -297,6 +315,13 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		return shoutList;
 	}
 	
+	/**
+	 * @author Craig
+	 * @param api - API wrapper used to make certain call to api
+	 * @param result - Return value from http call to api if success
+	 * @param e -  Return value from http call to api if failure
+	 * Return logic for a call to the API for postComment
+	 */
 	public void onPostCommentReturn(ShouterAPI api, final String result, final Exception e) {
 		runOnUiThread(new Runnable() {
 			@Override

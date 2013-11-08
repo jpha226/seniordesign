@@ -15,12 +15,14 @@ public class Shout {
 		
 		message = m;
 		
-		latitude = "";
-		longitude = "";
+		//latitude = "";
+		//longitude = "";
 		
 		if(loc != null){
-			latitude +=  loc.getLatitude();
-			longitude += loc.getLongitude();
+			latitude = convert(loc.getLatitude());
+			longitude = convert(loc.getLongitude());
+			//latitude +=  loc.getLatitude();
+			//longitude += loc.getLongitude();
 		}
 	}
 	
@@ -30,8 +32,8 @@ public class Shout {
 		message = m;
 		id = p;
 		if(loc != null){
-			latitude = "" + loc.getLatitude();
-			longitude = "" + loc.getLongitude();		
+			latitude = convert(loc.getLatitude());
+			longitude = convert(loc.getLongitude());		
 		}
 	}
 	
@@ -68,4 +70,12 @@ public class Shout {
 	
 	public String toString(){return message;}
 	
+	
+public static String convert( double degrees){
+	if (degrees <= 0 ){
+		degrees = degrees + 180;
+	}
+	String conDeg = "" + degrees;
+	return conDeg;
+	}
 }
