@@ -36,6 +36,7 @@ import com.google.android.gms.location.LocationListener;
 public class MainActivity extends Activity implements ShouterAPIDelegate{// implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
 
 	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE";
+	public final static String EXTRA_ID = "com.example.shouter.ID";
 	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 	private static final int GPS_RESOLUTION = 1;
 	private UserLocation userLocation;
@@ -91,6 +92,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				updateLocation();
 				
 				intent.putExtra(EXTRA_MESSAGE, message);
+				intent.putExtra(EXTRA_ID, "1");
 				startActivity(intent);
 				
 				
