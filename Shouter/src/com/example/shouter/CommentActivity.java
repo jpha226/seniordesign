@@ -52,17 +52,21 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_comment);
 		
-		initList();
+		api = new ShouterAPI();
+        api.setDelegate(this);
+		
 		updateLocation();
 		
-		lv = (ListView) findViewById(R.id.ListView);
+		initList();
+		lv = (ListView) findViewById(R.id.CommentListView);
 		
 		SimpleAdapter adapter = new SimpleAdapter(this, commentList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
 		lv.setAdapter(adapter);
 		
-		
 		// Show the Up button in the action bar.
 		setupActionBar(); // Josiah was here
+		
+        
 	}
 
 	/**
@@ -80,11 +84,10 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.comment, menu);
 		
-		
 		Intent intent = getIntent();
 		String message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
 
-		shout_id = intent.getStringExtra(MainActivity.EXTRA_ID);
+		//shout_id = intent.getStringExtra(MainActivity.EXTRA_ID);
 		
 		// Create text view
 		TextView textView = new TextView(this);
@@ -92,7 +95,6 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 		textView.setText(message);
 
 		setContentView(textView);
-		
 		
 		return true;
 	}

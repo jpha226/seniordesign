@@ -1,32 +1,50 @@
 <?xml version = "1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:padding="5dp"
+    android:orientation="vertical">
 
     <EditText android:id="@+id/edit_message"
-        android:layout_weight="1"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:background="#BDBDBD"
+        android:layout_marginBottom="5dp"
         android:hint="@string/edit_message"/>  
         
-    <Button 
+    <Button
+        android:id="@+id/post" 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_send"
+        android:layout_below="@+id/edit_message"
+        android:layout_toLeftOf="@+id/refresh"
+        android:layout_alignParentLeft="true"
+        android:background="#0000ff"
+        android:layout_marginRight="2dp"
         android:onClick="postMessage"/>
-
+		
     <Button
-        android:layout_width="wrap_content"
+        android:id = "@+id/refresh"
+        android:layout_width="165dp"
         android:layout_height="wrap_content"
         android:onClick="refresh"
+        android:layout_below="@+id/edit_message"
+        android:layout_alignParentRight="true"
+        android:background="#0000ff"
+        android:layout_marginLeft="2dp"
         android:text="@string/button_refresh" />
-        
- 	<ListView
- 	    android:id="@+id/ListView"
- 	    android:layout_width="wrap_content"
- 	    android:layout_height="wrap_content" />
     
-</LinearLayout>
+ 	<ListView
+ 	    android:id="@+id/listView"
+ 	    android:layout_width="wrap_content"
+ 	    android:layout_height="wrap_content"
+ 	    android:layout_below="@+id/post"
+ 	    android:background="#A4A4A4"
+ 	 	android:layout_marginTop="5dp"
+ 	    android:layout_alignParentBottom="true" />
+    
+</RelativeLayout>
 

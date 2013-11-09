@@ -72,7 +72,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		initList();
 		updateLocation();
 		
-		lv = (ListView) findViewById(R.id.ListView);
+		lv = (ListView) findViewById(R.id.listView);
 		
 		SimpleAdapter adapter = new SimpleAdapter(this, shoutList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
 		lv.setAdapter(adapter);
@@ -122,16 +122,12 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	 *  @param view The current view that function is called from
 	 */
 	public void postMessage(View view){
-		// Do something in response to button
 		
-		Intent intent = new Intent(this, DisplayMessageActivity.class);
+		// Do something in response to button
 		EditText editText = (EditText) findViewById(R.id.edit_message);
 		String message = editText.getText().toString();
 		
 		updateLocation();
-		
-		intent.putExtra(EXTRA_MESSAGE, message);
-		startActivity(intent);
 		
 		Shout myShout = new Shout(message, location);
 		
