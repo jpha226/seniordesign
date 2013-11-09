@@ -176,7 +176,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 			shoutList.add(0,createShout("shout", s));
 			shouts.add(s);
 		}
-		shoutList.add(0,createShout("shout", new Shout("refresh",null)));
+		//shoutList.add(0,createShout("shout", new Shout("refresh",null)));
 		
 		SimpleAdapter adapter = new SimpleAdapter(this, shoutList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
 		lv.setAdapter(adapter);

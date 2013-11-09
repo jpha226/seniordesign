@@ -15,7 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import com.androidtools.Networking;
+import com.androidtools.networking.Networking;
 import com.example.shouter.Shout;
 
 /**
@@ -30,7 +30,7 @@ public class ShouterAPI {
 	
 	private ExecutorService executor;
 	private ShouterAPIDelegate delegate;
-	private RestTemplate REST = com.androidtools.Networking.defaultRest();
+	private RestTemplate REST = com.androidtools.networking.Networking.defaultRest();
 	private String path;
 
 	List<Shout> shoutList = new ArrayList<Shout>();
@@ -156,7 +156,7 @@ public class ShouterAPI {
 	 * Function returns a list of shouts connected to the input parentId by querying the database through the API
 	 */
 	public List<Shout> getComment(final String parentId){
-		path = "/api/shout/search";
+		path = "/api/shout/comment/search";
 		executor.submit(new Runnable() { 
 			@Override
 			public void run() {

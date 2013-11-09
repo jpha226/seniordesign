@@ -18,6 +18,8 @@ import com.google.android.gms.location.LocationListener;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
@@ -45,6 +47,20 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 	public static final int DIALOG_LOADING = 0;
 	private ListView lv;
 	private String shout_id;
+	
+	
+	@Override
+    protected Dialog onCreateDialog(int id) {
+		ProgressDialog dialog = null;
+        switch (id) {
+        case DIALOG_LOADING:
+        	dialog = new ProgressDialog(this);
+        	((ProgressDialog) dialog).setMessage(getString(R.string.loading));        	
+        	((ProgressDialog) dialog).setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        	break;
+        }
+        return dialog;
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -174,6 +190,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 	
 	private void initList(){
 		
+		showDialog(DIALOG_LOADING);
 		List<Shout> comments = api.getComment(shout_id);
 		
 		for(Shout s: comments){
@@ -299,7 +316,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 				if(e != null)
 					Toast.makeText(CommentActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
 				else{
-					Toast.makeText(CommentActivity.this, result, Toast.LENGTH_LONG).show();
+					Toast.makeText(CommentActivity.this, "GETCOMMENT" + result, Toast.LENGTH_LONG).show();
 				//Get Comment Success Logic
 				//Same as get shout 
 				}
@@ -325,7 +342,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 				if(e != null)
 					Toast.makeText(CommentActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
 				else{
-					Toast.makeText(CommentActivity.this, result, Toast.LENGTH_LONG).show();
+					Toast.makeText(CommentActivity.this, "POSTCOMMENT" + result, Toast.LENGTH_LONG).show();
 				//Post Comment Success Logic
 				//same as post shout
 				}
