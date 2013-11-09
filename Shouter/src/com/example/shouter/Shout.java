@@ -15,9 +15,6 @@ public class Shout {
 		
 		message = m;
 		
-		//latitude = "";
-		//longitude = "";
-		
 		if(loc != null){
 			latitude = convert(loc.getLatitude());
 			longitude = convert(loc.getLongitude());

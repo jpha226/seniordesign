@@ -44,7 +44,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 	/* Dialogs */
 	public static final int DIALOG_LOADING = 0;
 	private ListView lv;
-	private 	String android_id;
+	private String shout_id;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +84,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 		Intent intent = getIntent();
 		String message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
 
-		android_id = intent.getStringExtra(MainActivity.EXTRA_ID);
+		shout_id = intent.getStringExtra(MainActivity.EXTRA_ID);
 		
 		// Create text view
 		TextView textView = new TextView(this);
@@ -130,18 +130,11 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 		Shout myShout = new Shout(message, location);
 		String id = Secure.getString(this.getContentResolver(),Secure.ANDROID_ID); 
 		myShout.setID(id);
-		myShout.setParent(android_id);
+		myShout.setParent(shout_id);
 		String lon = myShout.getLongitude();
 		String lat = myShout.getLatitude();
 		Toast.makeText(this, "Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG).show();
 		try {
-			
-			//if(location == null){
-			//	myShout.setLatitude(50.0);
-			//	myShout.setLongitude(50.0);
-				//myShout.setID("999999");
-				myShout.setParent("999998");
-			//}
 			
 			showDialog(DIALOG_LOADING);
 			api.postComment(myShout);
@@ -163,7 +156,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 		List<Shout> newShouts = new ArrayList<Shout>();
 		
 		showDialog(DIALOG_LOADING);
-		newShouts = api.getComment(android_id);
+		newShouts = api.getComment(shout_id);
 
 		for(Shout s : newShouts){
 			
@@ -171,17 +164,23 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 			
 		}
 		
+
+		SimpleAdapter adapter = new SimpleAdapter(this, commentList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
+		lv.setAdapter(adapter);
+		
 	}
 	
 	private void initList(){
 		
-		List<Shout> comments = api.getComment(android_id);
+		List<Shout> comments = api.getComment(shout_id);
 		
 		for(Shout s: comments){
 			
 			commentList.add(createShout("shout", s));
 			
 		}
+		
+		commentList.add(createShout("shout",new Shout("Test 1",null)));
 		
 	}
 

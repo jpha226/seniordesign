@@ -35,17 +35,19 @@ import com.google.android.gms.location.LocationListener;
 @SuppressWarnings("deprecation")
 public class MainActivity extends Activity implements ShouterAPIDelegate{// implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
 
-	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE";
-	public final static String EXTRA_ID = "com.example.shouter.ID";
+	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE"; // message
+	public final static String EXTRA_ID = "com.example.shouter.ID"; // id of shout
 	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 	private static final int GPS_RESOLUTION = 1;
-	private UserLocation userLocation;
-	private static Location location;
-	List<Map<String,String>> shoutList = new ArrayList<Map<String,String>>();
-	private ShouterAPI api;
+	private UserLocation userLocation; // For finding current location
+	private static Location location; // current location of user
+	private List<Map<String,String>> shoutList = new ArrayList<Map<String,String>>(); // Maintains list of shout messages
+	private List<Shout> shouts = new ArrayList<Shout>(); // Maintains the actual shouts in the list
+	private ShouterAPI api; // API to call
+	
 	/* Dialogs */
 	public static final int DIALOG_LOADING = 0;
-	private ListView lv;
+	private ListView lv; // The list
 	
 	@Override
     protected Dialog onCreateDialog(int id) {
@@ -92,7 +94,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				updateLocation();
 				
 				intent.putExtra(EXTRA_MESSAGE, message);
-				intent.putExtra(EXTRA_ID, "1");
+				intent.putExtra(EXTRA_ID, shouts.get(position).getID());
 				startActivity(intent);
 				
 				
@@ -113,9 +115,11 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		return true;
 	}
 	
-	/*
+	/**
 	 *  This function will push the entered message into the database. 
 	 *  The message will also be added to the displayed shouts
+	 *  @author Josiah
+	 *  @param view The current view that function is called from
 	 */
 	public void postMessage(View view){
 		// Do something in response to button
@@ -129,21 +133,17 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		intent.putExtra(EXTRA_MESSAGE, message);
 		startActivity(intent);
 		
-		
 		Shout myShout = new Shout(message, location);
+		
 		String android_id = Secure.getString(this.getContentResolver(),Secure.ANDROID_ID); 
 		myShout.setID(android_id);
+		
 		String lon = myShout.getLongitude();
 		String lat = myShout.getLatitude();
+		
 		Toast.makeText(MainActivity.this, "Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG).show();
+		
 		try {
-			
-			//if(location == null){
-			//	myShout.setLatitude(50.0);
-			//	myShout.setLongitude(50.0);
-				//myShout.setID("999999");
-				myShout.setParent("999998");
-			//}
 			
 			showDialog(DIALOG_LOADING);
 			api.postShout(myShout);
@@ -155,8 +155,8 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	}
 	
 	
-	/* This function will pull shouts from the database and update displayed shouts
-	 * 
+	/** This function will pull shouts from the database and update displayed shouts
+	 * @author Josiah
 	 */
 	public void refresh(View view){
 		
@@ -177,12 +177,20 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 
 		for(Shout s : newShouts){
 			
-			shoutList.add(createShout("shout", s));
-			
+			shoutList.add(0,createShout("shout", s));
+			shouts.add(s);
 		}
+		shoutList.add(0,createShout("shout", new Shout("refresh",null)));
+		
+		SimpleAdapter adapter = new SimpleAdapter(this, shoutList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
+		lv.setAdapter(adapter);
 		
 	}
 	
+	/**
+	 * Gets shouts and populates the list view
+	 * @author Craig
+	 */
 	private void initList(){
 		
 		shoutList.add(createShout("shout", new Shout("Test Shout 1",null)));
@@ -192,23 +200,32 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		shoutList.add(createShout("shout", new Shout("Test Shout 5",null)));
 		shoutList.add(createShout("shout", new Shout("Test Shout 6",null)));
 		shoutList.add(createShout("shout", new Shout("Test Shout 7",null)));
-		
+	
 	}
 
-//Use hashmaps to populate list. Can be expanded on once shout structure has been defined.
+	/**
+	 * @author Josiah and Craig
+	 * @param name A key for the Shout to be pushed into the map
+	 * @param shout The shout to be added to the list
+	 * @return
+	 */
 	private HashMap<String, String> createShout(String name, Shout shout){
 		
+		shouts.add(shout);
 		HashMap<String, String> item = new HashMap<String, String>();
 		item.put(name, shout.toString());
 		return item;
 		
 	}
 
+	/**
+	 * @author Josiah
+	 * @param none
+	 */
 	private void updateLocation(){
 		
 		userLocation = new UserLocation(this, GPS_RESOLUTION);
-		
-		
+	
 		userLocation.requestLocationUpdates(userLocation.defaultRequest(), new LocationListener(){
 			
 			@Override

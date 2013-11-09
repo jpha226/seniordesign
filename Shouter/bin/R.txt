@@ -57,8 +57,10 @@ int drawable ic_plusone_medium_off_client 0x7f020019
 int drawable ic_plusone_small_off_client 0x7f02001a
 int drawable ic_plusone_standard_off_client 0x7f02001b
 int drawable ic_plusone_tall_off_client 0x7f02001c
-int id ListView 0x7f050006
-int id action_settings 0x7f050008
+int id CommentListView 0x7f050006
+int id ListView 0x7f050009
+int id action_settings 0x7f05000a
+int id edit_comment 0x7f050008
 int id edit_message 0x7f050007
 int id hybrid 0x7f050004
 int id none 0x7f050000
