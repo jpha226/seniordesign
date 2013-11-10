@@ -44,6 +44,8 @@
  	    android:layout_below="@+id/post"
  	    android:background="#A4A4A4"
  	 	android:layout_marginTop="5dp"
+ 	 	android:divider="@android:color/transparent"
+ 	 	android:dividerHeight="5dp"
  	    android:layout_alignParentBottom="true" />
     
 </RelativeLayout>

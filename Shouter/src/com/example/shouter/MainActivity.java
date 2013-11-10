@@ -134,7 +134,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		// Do something in response to button
 		EditText editText = (EditText) findViewById(R.id.edit_message);
 		String message = editText.getText().toString();
-		
+		editText.setText("");
 		updateLocation();
 		
 		Shout myShout = new Shout(message, location);
@@ -155,7 +155,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		} catch (JsonGenerationException e) {e.printStackTrace();} catch (JsonMappingException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();} 
 		
 		refresh(view); // automatically refresh after posting message
-		editText.setText("");
+		
 	}
 	
 	

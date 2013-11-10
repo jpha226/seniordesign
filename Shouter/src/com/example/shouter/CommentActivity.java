@@ -138,18 +138,23 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 	public void postComment(View view){
 		// Do something in response to button
 		
-		EditText editText = (EditText) findViewById(R.id.edit_message);
+		EditText editText = (EditText) findViewById(R.id.edit_comment);
 		String message = editText.getText().toString();
+		editText.setText("");
 		
 		updateLocation();
 		
 		Shout myShout = new Shout(message, location);
 		String id = Secure.getString(this.getContentResolver(),Secure.ANDROID_ID); 
+		
 		myShout.setID(id);
 		myShout.setParent(shout_id);
+		
 		String lon = myShout.getLongitude();
 		String lat = myShout.getLatitude();
+		
 		Toast.makeText(this, "Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG).show();
+		
 		try {
 			
 			showDialog(DIALOG_LOADING);
