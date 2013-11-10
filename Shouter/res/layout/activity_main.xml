@@ -22,7 +22,7 @@
         android:layout_below="@+id/edit_message"
         android:layout_toLeftOf="@+id/refresh"
         android:layout_alignParentLeft="true"
-        android:background="#0000ff"
+        android:background="#2E64FE"
         android:layout_marginRight="2dp"
         android:onClick="postMessage"/>
 		
@@ -33,7 +33,7 @@
         android:onClick="refresh"
         android:layout_below="@+id/edit_message"
         android:layout_alignParentRight="true"
-        android:background="#0000ff"
+        android:background="#2E64FE"
         android:layout_marginLeft="2dp"
         android:text="@string/button_refresh" />
     
@@ -44,8 +44,8 @@
  	    android:layout_below="@+id/post"
  	    android:background="#A4A4A4"
  	 	android:layout_marginTop="5dp"
- 	 	android:divider="@android:color/transparent"
- 	 	android:dividerHeight="5dp"
+ 	 	android:divider="@android:color/white"
+ 	 	android:dividerHeight="2dp"
  	    android:layout_alignParentBottom="true" />
     
 </RelativeLayout>

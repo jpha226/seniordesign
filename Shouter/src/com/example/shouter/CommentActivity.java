@@ -185,7 +185,6 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 			
 		}
 		
-
 		SimpleAdapter adapter = new SimpleAdapter(this, commentList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
 		lv.setAdapter(adapter);
 		

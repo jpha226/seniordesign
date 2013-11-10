@@ -21,6 +21,9 @@
  	    android:layout_width="wrap_content"
  	    android:layout_height="wrap_content" 
  	    android:layout_below="@+id/comment_text"
+ 	    android:divider="@android:color/white"
+ 	    android:dividerHeight="2dp"
+ 	    android:background="#AFAFAF"
  	    android:layout_marginBottom="5dp"
  	    />
     
@@ -37,6 +40,7 @@
         android:layout_height="50dp"
         android:text="@string/comment_send"
         android:layout_below="@+id/edit_comment"
+        android:background="#0000ff"
         android:id="@+id/postComment"
         android:onClick="postComment"/>
 
