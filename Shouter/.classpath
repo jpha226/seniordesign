@@ -7,6 +7,6 @@
 	<classpathentry exported="true" kind="lib" path="/AndroidTools/bin/androidtools.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/AndroidTools"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
-	<classpathentry kind="lib" path="C:/Users/Craig/jar/google-gson-2.2.4/gson-2.2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/gson-2.2.4.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
