@@ -11,12 +11,18 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.view.Menu;
@@ -28,6 +34,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.androidtools.networking.Networking;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
 import com.google.android.gms.location.LocationListener;
@@ -44,6 +51,8 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	private List<Map<String,String>> shoutList = new ArrayList<Map<String,String>>(); // Maintains list of shout messages
 	private List<Shout> shouts = new ArrayList<Shout>(); // Maintains the actual shouts in the list
 	private ShouterAPI api; // API to call
+	private RestTemplate REST = Networking.defaultRest();
+	private static final String Shouter_URL = "http://shouterapi-env.elasticbeanstalk.com/shouter";
 	
 	/* Dialogs */
 	public static final int DIALOG_LOADING = 0;
@@ -143,8 +152,8 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 			
 			showDialog(DIALOG_LOADING);
 			api.postShout(myShout);
-			
-		} catch (JsonGenerationException e) {e.printStackTrace();} catch (JsonMappingException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();}
+			//new putShoutAsyncTask().execute(myShout);
+		} catch (JsonGenerationException e) {e.printStackTrace();} catch (JsonMappingException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();} 
 		
 		refresh(view); // automatically refresh after posting message
 		
@@ -170,11 +179,11 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		
 		showDialog(DIALOG_LOADING);
 		newShouts = api.getShout(lat, lon);
-
+		Toast.makeText(MainActivity.this, "NEWSHOUTSIZE" + newShouts.size(), Toast.LENGTH_LONG).show();
 		for(Shout s : newShouts){
-			
+			Toast.makeText(MainActivity.this, "NEWSHOUTTEST" + s.getMessage(), Toast.LENGTH_LONG).show();
 			shoutList.add(0,createShout("shout", s));
-			shouts.add(s);
+			shouts.add(0,s);
 		}
 		//shoutList.add(0,createShout("shout", new Shout("refresh",null)));
 		
@@ -270,9 +279,11 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 					}catch(Exception e1){
 						e1.printStackTrace();}
 					Collections.reverse(shoutList);
+					//Toast.makeText(MainActivity.this, "GETAPART" + shoutList.get(0).getMessage(), Toast.LENGTH_LONG).show();
 					Toast.makeText(MainActivity.this, "GET" + result, Toast.LENGTH_LONG).show();
 			}
 		}});
+		//Toast.makeText(MainActivity.this, "blah" + shoutList.get(0).getMessage(), Toast.LENGTH_LONG).show();
 		return shoutList;
 	}
     
@@ -295,8 +306,6 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				else{
 					Toast.makeText(MainActivity.this, "POST" + result, Toast.LENGTH_LONG).show();
 					
-				//Post Shout Success Logic
-				//Return logic not that important, if not error should return shout
 				}
 			}
 		});
@@ -356,5 +365,42 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	}
 
 	
-	
+//Testing out ASync activities.  STill no clue what is going on.
+	private class putShoutAsyncTask extends AsyncTask<Shout,Void,String> {
+		@Override
+		protected void onPreExecute() {
+			showDialog(DIALOG_LOADING);
+		}
+		
+		@Override
+		protected String doInBackground(Shout... message) {
+			String path = "/api/shout/create";
+			ResponseEntity<String> response;
+			try {
+				HttpHeaders headers = new HttpHeaders();
+				HttpEntity<String> request = new HttpEntity<String>(headers);
+				
+				
+				String url = Shouter_URL + path + "?phoneId=" + message[0].getID() + "&message=" + message[0].getMessage() + "&latitude=" + message[0].getLatitude() + "&longitude=" + message[0].getLongitude() + "&parentId=" + message[0].getParent(); 
+				response = REST.exchange(url, HttpMethod.PUT, request, String.class);
+			} catch(Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+			return response.getBody();
+		}
+		
+		@Override
+		protected void onPostExecute(String result) {
+			if(!isFinishing())
+				dismissDialog(DIALOG_LOADING);
+
+			if(result == null)
+				Toast.makeText(MainActivity.this, "Error getting Shout", Toast.LENGTH_LONG).show();
+			else
+				Toast.makeText(MainActivity.this, "PutShout" + result, Toast.LENGTH_SHORT).show();
+		}
+	};
 }
+	
+

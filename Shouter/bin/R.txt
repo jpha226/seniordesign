@@ -5,7 +5,9 @@ int attr cameraTargetLat 0x7f010004
 int attr cameraTargetLng 0x7f010005
 int attr cameraTilt 0x7f010006
 int attr cameraZoom 0x7f010007
+int attr customFont 0x7f010010
 int attr mapType 0x7f010002
+int attr shadowColors 0x7f010011
 int attr uiCompass 0x7f010008
 int attr uiRotateGestures 0x7f010009
 int attr uiScrollGestures 0x7f01000a
@@ -58,16 +60,17 @@ int drawable ic_plusone_small_off_client 0x7f02001a
 int drawable ic_plusone_standard_off_client 0x7f02001b
 int drawable ic_plusone_tall_off_client 0x7f02001c
 int id CommentListView 0x7f050006
-int id ListView 0x7f050008
-int id action_settings 0x7f05000d
+int id ListView 0x7f050009
+int id action_settings 0x7f05000e
 int id edit_comment 0x7f050007
-int id edit_message 0x7f050009
+int id edit_message 0x7f05000a
 int id hybrid 0x7f050004
-int id listView 0x7f05000c
+int id listView 0x7f05000d
 int id none 0x7f050000
 int id normal 0x7f050001
-int id post 0x7f05000a
-int id refresh 0x7f05000b
+int id post 0x7f05000b
+int id postComment 0x7f050008
+int id refresh 0x7f05000c
 int id satellite 0x7f050002
 int id terrain 0x7f050003
 int id text 0x7f050005
@@ -86,6 +89,7 @@ int string auth_client_needs_update_title 0x7f060017
 int string auth_client_play_services_err_notification_msg 0x7f060018
 int string auth_client_requested_by_msg 0x7f060019
 int string auth_client_using_bad_version_title 0x7f060014
+int string button_comment 0x7f060026
 int string button_refresh 0x7f060020
 int string button_send 0x7f06001f
 int string comment 0x7f06001e
@@ -121,6 +125,12 @@ int style AppTheme 0x7f090001
 int[] styleable AdsAttrs { 0x7f010000, 0x7f010001 }
 int styleable AdsAttrs_adSize 0
 int styleable AdsAttrs_adUnitId 1
+int[] styleable CustomTextView { 0x01010162, 0x01010163, 0x01010164, 0x7f010010, 0x7f010011 }
+int styleable CustomTextView_android_shadowDx 0
+int styleable CustomTextView_android_shadowDy 1
+int styleable CustomTextView_android_shadowRadius 2
+int styleable CustomTextView_customFont 3
+int styleable CustomTextView_shadowColors 4
 int[] styleable MapAttrs { 0x7f010002, 0x7f010003, 0x7f010004, 0x7f010005, 0x7f010006, 0x7f010007, 0x7f010008, 0x7f010009, 0x7f01000a, 0x7f01000b, 0x7f01000c, 0x7f01000d, 0x7f01000e, 0x7f01000f }
 int styleable MapAttrs_cameraBearing 1
 int styleable MapAttrs_cameraTargetLat 2
