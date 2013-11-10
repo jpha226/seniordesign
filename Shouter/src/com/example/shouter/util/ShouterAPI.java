@@ -177,7 +177,9 @@ public class ShouterAPI {
 
 		return shoutList;
 }
-
+	
+	public void setShoutList(List<Shout> sl){shoutList = sl;}
+	public List<Shout> getShoutList(){return shoutList;}
 }
 
 

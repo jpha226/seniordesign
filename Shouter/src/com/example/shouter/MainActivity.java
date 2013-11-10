@@ -10,7 +10,6 @@ import java.util.Map;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -38,6 +37,8 @@ import com.androidtools.networking.Networking;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
 import com.google.android.gms.location.LocationListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.*;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends Activity implements ShouterAPIDelegate{// implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener{
@@ -50,6 +51,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	private static Location location; // current location of user
 	private List<Map<String,String>> shoutList = new ArrayList<Map<String,String>>(); // Maintains list of shout messages
 	private List<Shout> shouts = new ArrayList<Shout>(); // Maintains the actual shouts in the list
+	private List<Shout> innerShoutList = new ArrayList<Shout>();
 	private ShouterAPI api; // API to call
 	private RestTemplate REST = Networking.defaultRest();
 	private static final String Shouter_URL = "http://shouterapi-env.elasticbeanstalk.com/shouter";
@@ -155,7 +157,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 			//new putShoutAsyncTask().execute(myShout);
 		} catch (JsonGenerationException e) {e.printStackTrace();} catch (JsonMappingException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();} 
 		
-		refresh(view); // automatically refresh after posting message
+		//refresh(view); // automatically refresh after posting message
 		
 	}
 	
@@ -261,7 +263,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 	 * Return logic for a call to the API for getShout
 	 */
 	@Override
-	public List<Shout> onGetShoutReturn(ShouterAPI api, final String result, final Exception e) {
+	public List<Shout> onGetShoutReturn(final ShouterAPI api, final String result, final Exception e) {
 		final List<Shout> shoutList = new ArrayList<Shout>();
 		runOnUiThread(new Runnable() {
 			@Override
@@ -273,17 +275,22 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 					Toast.makeText(MainActivity.this, e.toString(), Toast.LENGTH_LONG).show();
 				else{
 					List<Shout> shoutList = new ArrayList();
-					ObjectMapper mapper = new ObjectMapper();
+					Gson gson = new Gson();
+					//ObjectMapper mapper = new ObjectMapper();
 					try{
-						shoutList = mapper.readValue(result, new TypeReference<List<Shout>>(){});
+						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>(){};
+						shoutList = gson.fromJson(result, token.getType());
+						
+						api.setShoutList(shoutList);
+						//mapper.readValue(result, new TypeReference<List<Shout>>(){}));
 					}catch(Exception e1){
 						e1.printStackTrace();}
 					Collections.reverse(shoutList);
-					//Toast.makeText(MainActivity.this, "GETAPART" + shoutList.get(0).getMessage(), Toast.LENGTH_LONG).show();
+					//Toast.makeText(MainActivity.this, "GETAPART" + innerShoutList.get(0).getMessage(), Toast.LENGTH_LONG).show();
 					Toast.makeText(MainActivity.this, "GET" + result, Toast.LENGTH_LONG).show();
 			}
 		}});
-		//Toast.makeText(MainActivity.this, "blah" + shoutList.get(0).getMessage(), Toast.LENGTH_LONG).show();
+		Toast.makeText(MainActivity.this, "blah" + api.getShoutList().get(0).getMessage(), Toast.LENGTH_LONG).show();
 		return shoutList;
 	}
     
