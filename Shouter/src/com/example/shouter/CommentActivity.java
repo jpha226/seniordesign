@@ -106,11 +106,9 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 		//shout_id = intent.getStringExtra(MainActivity.EXTRA_ID);
 		
 		// Create text view
-		TextView textView = new TextView(this);
+		TextView textView = (TextView) findViewById(R.id.comment_text);
 		textView.setTextSize(40);
 		textView.setText(message);
-
-		setContentView(textView);
 		
 		return true;
 	}

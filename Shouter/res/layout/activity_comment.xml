@@ -7,10 +7,10 @@
 
     
      <TextView
-        android:id="@+id/text"
+        android:id="@+id/comment_text"
         android:layout_width="fill_parent"
-        android:layout_height="50dp"
-        android:textSize="20sp"
+        android:layout_height="100dp"
+        android:textSize="40sp"
         android:layout_alignParentTop="true"
         android:layout_marginBottom="5dp"
         android:background="#BDBDBD"
@@ -20,24 +20,23 @@
  	    android:id="@+id/CommentListView"
  	    android:layout_width="wrap_content"
  	    android:layout_height="wrap_content" 
- 	    android:layout_below="@+id/text"
+ 	    android:layout_below="@+id/comment_text"
  	    android:layout_marginBottom="5dp"
  	    />
     
     <EditText 
         android:id="@+id/edit_comment"
-        android:layout_width="wrap_content"
-        android:layout_height="10dp"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
         android:layout_below="@+id/CommentListView"
         android:layout_marginBottom="5dp"
         android:hint="@string/comment"/>  
         
     <Button 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
         android:text="@string/comment_send"
         android:layout_below="@+id/edit_comment"
-        android:layout_alignParentBottom = "true"
         android:id="@+id/postComment"
         android:onClick="postComment"/>
 

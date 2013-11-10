@@ -15,7 +15,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import com.androidtools.networking.Networking;
 import com.example.shouter.Shout;
 
 /**
@@ -30,7 +29,7 @@ public class ShouterAPI {
 	
 	private ExecutorService executor;
 	private ShouterAPIDelegate delegate;
-	private RestTemplate REST = com.androidtools.networking.Networking.defaultRest();
+	private RestTemplate REST = com.androidtools.Networking.defaultRest();
 	private String path;
 
 	List<Shout> shoutList = new ArrayList<Shout>();
@@ -179,5 +178,3 @@ public class ShouterAPI {
 }
 
 }
-
-

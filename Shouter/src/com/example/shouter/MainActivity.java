@@ -34,7 +34,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidtools.networking.Networking;
+import com.androidtools.Networking;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
 import com.google.android.gms.location.LocationListener;
@@ -106,7 +106,6 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 				intent.putExtra(EXTRA_ID, shouts.get(position).getID());
 				startActivity(intent);
 				
-				
 			}
 			
 		});
@@ -156,7 +155,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate{// impl
 		} catch (JsonGenerationException e) {e.printStackTrace();} catch (JsonMappingException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();} 
 		
 		refresh(view); // automatically refresh after posting message
-		
+		editText.setText("");
 	}
 	
 	
