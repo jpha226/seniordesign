@@ -52,7 +52,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	private static final int GPS_RESOLUTION = 1;
 	private UserLocation userLocation; // For finding current location
 	private static Location location; // current location of user
-	private List<Map<String, String>> shoutList = new ArrayList<Map<String, String>>(); // Maintains
+	private List<Map<String, String>> shoutMap = new ArrayList<Map<String, String>>(); // Maintains
 																						// list
 																						// of
 																						// shout
@@ -93,7 +93,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 
 		lv = (ListView) findViewById(R.id.listView);
 
-		SimpleAdapter adapter = new SimpleAdapter(this, shoutList,
+		SimpleAdapter adapter = new SimpleAdapter(this, shoutMap,
 				android.R.layout.simple_list_item_1, new String[] { "shout" },
 				new int[] { android.R.id.text1 });
 		lv.setAdapter(adapter);
@@ -214,22 +214,23 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		showDialog(DIALOG_LOADING);
 		api.getShout(lat, lon);
 		
+		//needs to wait for API.getshout to run
+		/*
 		newShouts = api.getShoutList();
-		Toast.makeText(MainActivity.this, "NEWSHOUTSIZE" + newShouts.size(),
-				Toast.LENGTH_LONG).show();
+		Toast.makeText(MainActivity.this, "NEWSHOUTSIZE" + newShouts.size(),Toast.LENGTH_LONG).show();
+		
 		for (Shout s : newShouts) {
-			Toast.makeText(MainActivity.this, "NEWSHOUTTEST" + s.getMessage(),
-					Toast.LENGTH_LONG).show();
-			shoutList.add(0, createShout("shout", s));
+			Toast.makeText(MainActivity.this, "NEWSHOUTTEST" + s.getMessage(),Toast.LENGTH_LONG).show();
+			shoutMap.add(0, createShout("shout", s));
 			shouts.add(0, s);
 		}
 		// shoutList.add(0,createShout("shout", new Shout("refresh",null)));
 
-		SimpleAdapter adapter = new SimpleAdapter(this, shoutList,
+		SimpleAdapter adapter = new SimpleAdapter(this, shoutMap,
 				android.R.layout.simple_list_item_1, new String[] { "shout" },
 				new int[] { android.R.id.text1 });
 		lv.setAdapter(adapter);
-
+*/
 	}
 
 	/**
@@ -239,14 +240,14 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 */
 	private void initList() {
 
-		shoutList.add(createShout("shout", new Shout("Test Shout 1", null)));
-		shoutList.add(createShout("shout", new Shout(
+		shoutMap.add(createShout("shout", new Shout("Test Shout 1", null)));
+		shoutMap.add(createShout("shout", new Shout(
 				"Just making sure this App is working", null)));
-		shoutList.add(createShout("shout", new Shout("Woot Shouter", null)));
-		shoutList.add(createShout("shout", new Shout("Still working", null)));
-		shoutList.add(createShout("shout", new Shout("Test Shout 5", null)));
-		shoutList.add(createShout("shout", new Shout("Test Shout 6", null)));
-		shoutList.add(createShout("shout", new Shout("Test Shout 7", null)));
+		shoutMap.add(createShout("shout", new Shout("Woot Shouter", null)));
+		shoutMap.add(createShout("shout", new Shout("Still working", null)));
+		shoutMap.add(createShout("shout", new Shout("Test Shout 5", null)));
+		shoutMap.add(createShout("shout", new Shout("Test Shout 6", null)));
+		shoutMap.add(createShout("shout", new Shout("Test Shout 7", null)));
 
 	}
 
@@ -333,8 +334,19 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 						Toast.makeText(MainActivity.this, "There was a catch" + e1.toString(),Toast.LENGTH_LONG).show();
 					}
 					Toast.makeText(MainActivity.this, "GET" + result.substring(10, result.length()-1),Toast.LENGTH_LONG).show();
-					Toast.makeText(MainActivity.this, "shoutlist size" + shoutList.size(),Toast.LENGTH_LONG).show();
-					Toast.makeText(MainActivity.this, "teat" + api.getShoutList().get(1).getMessage(),Toast.LENGTH_LONG).show();
+					//Toast.makeText(MainActivity.this, "shoutlist size" + shoutList.size(),Toast.LENGTH_LONG).show();
+					//Toast.makeText(MainActivity.this, "teat" + api.getShoutList().get(1).getMessage(),Toast.LENGTH_LONG).show();
+					// Testing stuff 
+					
+					for (Shout s : api.getShoutList()) {
+						Toast.makeText(MainActivity.this, "NEWSHOUTTEST" + s.getMessage(),Toast.LENGTH_LONG).show();
+						shoutMap.add(0, createShout("shout", s));
+						shouts.add(0, s);
+					}
+					// shoutList.add(0,createShout("shout", new Shout("refresh",null)));
+
+					SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, shoutMap,android.R.layout.simple_list_item_1, new String[] { "shout" },new int[] { android.R.id.text1 });
+					lv.setAdapter(adapter);
 				}
 			}
 		});
@@ -459,8 +471,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 						+ message[0].getLatitude() + "&longitude="
 						+ message[0].getLongitude() + "&parentId="
 						+ message[0].getParent();
-				response = REST.exchange(url, HttpMethod.PUT, request,
-						String.class);
+				response = REST.exchange(url, HttpMethod.PUT, request,String.class);
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;
