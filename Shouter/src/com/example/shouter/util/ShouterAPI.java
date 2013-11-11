@@ -156,19 +156,19 @@ public class ShouterAPI {
 					HttpHeaders headers = new HttpHeaders();
 					HttpEntity<String> request = new HttpEntity<String>(headers);
 					String url = Shouter_URL + path + "?phoneId="
-							+ message.getID() + "&message="
+							+ message.getUser() + "&message="
 							+ message.getMessage() + "&latitude="
 							+ message.getLatitude() + "&longitude="
 							+ message.getLongitude() + "&parentId="
 							+ message.getParent();
 					response = REST.exchange(url, HttpMethod.POST, request,
 							String.class);
-					delegate.onPostShoutReturn(ShouterAPI.this,
+					delegate.onPostCommentReturn(ShouterAPI.this,
 							response.getBody(), null);
 
 				} catch (Exception e) {
 					e.printStackTrace();
-					delegate.onPostShoutReturn(ShouterAPI.this, null, e);
+					delegate.onPostCommentReturn(ShouterAPI.this, null, e);
 				}
 
 			}

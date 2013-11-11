@@ -9,12 +9,12 @@ import java.util.Map;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
 
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
 import com.google.android.gms.location.LocationListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -41,7 +41,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
         private static final int GPS_RESOLUTION = 1;
         private UserLocation userLocation;
         private static Location location;
-        List<Map<String,String>> commentList = new ArrayList<Map<String,String>>();
+        List<Map<String,String>> commentMap = new ArrayList<Map<String,String>>();
         private ShouterAPI api;
         /* Dialogs */
         public static final int DIALOG_LOADING = 0;
@@ -68,16 +68,31 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 super.onCreate(savedInstanceState);
                 setContentView(R.layout.activity_comment);
                 
+                Intent intent = getIntent();
+                String message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
+
+                shout_id = intent.getStringExtra(MainActivity.EXTRA_ID);
+                
+                // Create text view
+                TextView textView = (TextView) findViewById(R.id.comment_text);
+                textView.setTextSize(40);
+                textView.setText(message);
+                
                 api = new ShouterAPI();
-        api.setDelegate(this);
+                api.setDelegate(this);
                 
                 updateLocation();
                 
-                initList();
+                View view = findViewById(R.id.postComment);
+                
+               // initList();
                 lv = (ListView) findViewById(R.id.CommentListView);
                 
-                SimpleAdapter adapter = new SimpleAdapter(this, commentList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
+                SimpleAdapter adapter = new SimpleAdapter(this, commentMap, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
                 lv.setAdapter(adapter);
+                
+                refresh(view);
+
                 
                 // Show the Up button in the action bar.
                 setupActionBar(); // Josiah was here
@@ -99,17 +114,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
         public boolean onCreateOptionsMenu(Menu menu) {
                 // Inflate the menu; this adds items to the action bar if it is present.
                 getMenuInflater().inflate(R.menu.comment, menu);
-                
-                Intent intent = getIntent();
-                String message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
 
-                //shout_id = intent.getStringExtra(MainActivity.EXTRA_ID);
-                
-                // Create text view
-                TextView textView = (TextView) findViewById(R.id.comment_text);
-                textView.setTextSize(40);
-                textView.setText(message);
-                
                 return true;
         }
 
@@ -153,8 +158,8 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 String lon = myShout.getLongitude();
                 String lat = myShout.getLatitude();
                 
-                Toast.makeText(this, "Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG).show();
-                
+                //Toast.makeText(this, "Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG).show();
+                //Toast.makeText(CommentActivity.this, "ParentId:" + myShout.getParent(),Toast.LENGTH_LONG).show();
                 try {
                         
                         showDialog(DIALOG_LOADING);
@@ -162,7 +167,6 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                         
                 } catch (JsonGenerationException e) {e.printStackTrace();} catch (JsonMappingException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();}
                 
-                refresh(view); // automatically refresh after posting message
                 
         }
         
@@ -175,34 +179,11 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 updateLocation();
                 
                 List<Shout> newShouts = new ArrayList<Shout>();
-                
+                //Toast.makeText(CommentActivity.this, "ParentId of get: " +shout_id,Toast.LENGTH_LONG).show();
                 showDialog(DIALOG_LOADING);
                 newShouts = api.getComment(shout_id);
-
-                for(Shout s : newShouts){
-                        
-                        commentList.add(createShout("shout", s));
-                        
-                }
                 
-                SimpleAdapter adapter = new SimpleAdapter(this, commentList, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
-                lv.setAdapter(adapter);
-                
-        }
-        
-        private void initList(){
-                
-                showDialog(DIALOG_LOADING);
-                List<Shout> comments = api.getComment(shout_id);
-                
-                for(Shout s: comments){
-                        
-                        commentList.add(createShout("shout", s));
-                        
-                }
-                
-                commentList.add(createShout("shout",new Shout("Test 1",null)));
-                
+              
         }
 
 //Use hashmaps to populate list. Can be expanded on once shout structure has been defined.
@@ -238,67 +219,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 
                 
         }
-
-        
-        /**
-         * @author Craig
-         * @param api - API wrapper used to make certain call to api
-         * @param result - Return value from http call to api if success
-         * @param e -  Return value from http call to api if failure
-         * @return List of shouts from call to api for GetShout
-         * Return logic for a call to the API for getShout
-         */
-        @Override
-        public List<Shout> onGetShoutReturn(ShouterAPI api, final String result, final Exception e) {
-                final List<Shout> shoutList = new ArrayList<Shout>();
-                runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                                if(!isFinishing())
-                                        dismissDialog(DIALOG_LOADING);
-                        
-                                if(e != null)
-                                        Toast.makeText(CommentActivity.this, e.toString(), Toast.LENGTH_LONG).show();
-                                else{
-                                        List<Shout> shoutList = new ArrayList();
-                                        ObjectMapper mapper = new ObjectMapper();
-                                        try{
-                                                shoutList = mapper.readValue(result, new TypeReference<List<Shout>>(){});
-                                        }catch(Exception e1){
-                                                e1.printStackTrace();}
-                                        Collections.reverse(shoutList);
-                                        Toast.makeText(CommentActivity.this, "GET" + result, Toast.LENGTH_LONG).show();
-                        }
-                }});
-                return shoutList;
-        }
-    
-        /**
-         * @author Craig
-         * @param api - API wrapper used to make certain call to api
-         * @param result - Return value from http call to api if success
-         * @param e -  Return value from http call to api if failure
-         * Return logic for a call to the API for postShout
-         */
-        public void onPostShoutReturn(ShouterAPI api, final String result, final Exception e) {
-                runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                                if(!isFinishing())
-                                        dismissDialog(DIALOG_LOADING);
-                        
-                                if(e != null)
-                                        Toast.makeText(CommentActivity.this, e.toString(), Toast.LENGTH_LONG).show();
-                                else{
-                                        Toast.makeText(CommentActivity.this, "POST" + result, Toast.LENGTH_LONG).show();
-                                        
-                                //Post Shout Success Logic
-                                //Return logic not that important, if not error should return shout
-                                }
-                        }
-                });
-        }
-        
+     
         /**
          * @author Craig
          * @param api - API wrapper used to make certain call to api
@@ -307,7 +228,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
          * @return List of shouts from call to api for getComment
          * Return logic for a call to the API for getComment
          */
-        public List<Shout> onGetCommentReturn(ShouterAPI api, final String result, final Exception e) {
+        public List<Shout> onGetCommentReturn(final ShouterAPI api, final String result, final Exception e) {
                 final List<Shout> shoutList = new ArrayList<Shout>();
                 runOnUiThread(new Runnable() {
                         @Override
@@ -318,14 +239,33 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                                 if(e != null)
                                         Toast.makeText(CommentActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
                                 else{
-                                        Toast.makeText(CommentActivity.this, "GETCOMMENT" + result, Toast.LENGTH_LONG).show();
-                                //Get Comment Success Logic
-                                //Same as get shout 
-                                }
-                        }
-                });
-                return shoutList;
-        }
+                                	List<Shout> shoutList = new ArrayList();
+                					Gson gson = new Gson();
+                					try {
+                						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {};
+                						shoutList = gson.fromJson(result.substring(12,result.length()-1), token.getType());
+                						Collections.reverse(shoutList);
+                						api.setShoutList(shoutList);
+                					} catch (Exception e1) {
+                						//e1.printStackTrace();
+                						//Toast.makeText(CommentActivity.this, "There was a catch" + e1.toString(),Toast.LENGTH_LONG).show();
+                						Toast.makeText(CommentActivity.this, "Error Getting Comments, Please try again" + e1.toString(),Toast.LENGTH_LONG).show();
+                					}
+                					//Toast.makeText(CommentActivity.this, "GET" + result.substring(12, result.length()-1),Toast.LENGTH_LONG).show();
+                					// Testing stuff 
+                					commentMap = new ArrayList<Map<String,String>>();
+                					for (Shout s : api.getShoutList()) {
+                						commentMap.add(0, createShout("shout", s));
+                						//shouts.add(0, s);
+                					}
+
+                					SimpleAdapter adapter = new SimpleAdapter(CommentActivity.this, commentMap,android.R.layout.simple_list_item_1, new String[] { "shout" },new int[] { android.R.id.text1 });
+                					lv.setAdapter(adapter);
+                				}
+                			}
+                		});
+                		return shoutList;
+                	}
         
         /**
          * @author Craig
@@ -334,7 +274,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
          * @param e -  Return value from http call to api if failure
          * Return logic for a call to the API for postComment
          */
-        public void onPostCommentReturn(ShouterAPI api, final String result, final Exception e) {
+        public void onPostCommentReturn(final ShouterAPI api, final String result, final Exception e) {
                 runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -344,11 +284,90 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                                 if(e != null)
                                         Toast.makeText(CommentActivity.this, "Error getting sentence", Toast.LENGTH_SHORT).show();
                                 else{
-                                        Toast.makeText(CommentActivity.this, "POSTCOMMENT" + result, Toast.LENGTH_LONG).show();
-                                //Post Comment Success Logic
-                                //same as post shout
-                                }
-                        }
-                });
-        }
+                                	List<Shout> shoutList = new ArrayList();
+                					Gson gson = new Gson();
+                					try {
+                						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {};
+                						shoutList = gson.fromJson(result.substring(12,result.length()-1), token.getType());
+                						Collections.reverse(shoutList);
+                						api.setShoutList(shoutList);
+                					} catch (Exception e1) {
+                						//e1.printStackTrace();
+                						Toast.makeText(CommentActivity.this, "Error, Please Try again",Toast.LENGTH_LONG).show();
+                					}
+                					//Toast.makeText(CommentActivity.this, "GET" + result.substring(12, result.length()-1),Toast.LENGTH_LONG).show();
+                					// Testing stuff 
+                					commentMap = new ArrayList<Map<String,String>>();
+                					for (Shout s : api.getShoutList()) {
+                						commentMap.add(0, createShout("shout", s));
+                						//shouts.add(0, s);
+                					}
+
+                					SimpleAdapter adapter = new SimpleAdapter(CommentActivity.this, commentMap,android.R.layout.simple_list_item_1, new String[] { "shout" },new int[] { android.R.id.text1 });
+                					lv.setAdapter(adapter);
+                				}
+                			}
+                		});
+                	}
+
+
+
+        public void onPostShoutReturn(ShouterAPI api, final String result,
+        		final Exception e) {
+        	runOnUiThread(new Runnable() {
+        		@Override
+        		public void run() {
+        			if (!isFinishing())
+        				dismissDialog(DIALOG_LOADING);
+
+        			if (e != null)
+        				Toast.makeText(CommentActivity.this, e.toString(),
+        						Toast.LENGTH_LONG).show();
+        			else {
+        				Toast.makeText(CommentActivity.this, "POST" + result, Toast.LENGTH_LONG).show();
+
+			}
+		}
+	});
+}
+    	public List<Shout> onGetShoutReturn(final ShouterAPI api,
+    			final String result, final Exception e) {
+    		final List<Shout> shoutList = new ArrayList<Shout>();
+    		runOnUiThread(new Runnable() {
+    			@Override
+    			public void run() {
+    				if (!isFinishing())
+    					dismissDialog(DIALOG_LOADING);
+
+    				if (e != null)
+    					Toast.makeText(CommentActivity.this, e.toString(),Toast.LENGTH_LONG).show();
+    				else {
+    					List<Shout> shoutList = new ArrayList();
+    					Gson gson = new Gson();
+    					try {
+    						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {};
+    						shoutList = gson.fromJson(result.substring(13,result.length()-1), token.getType());
+    						Collections.reverse(shoutList);
+    						api.setShoutList(shoutList);
+    					} catch (Exception e1) {
+    						//e1.printStackTrace();
+    						Toast.makeText(CommentActivity.this, "There was a catch" + e1.toString(),Toast.LENGTH_LONG).show();
+    					}
+    					Toast.makeText(CommentActivity.this, "GET" + result.substring(10, result.length()-1),Toast.LENGTH_LONG).show();
+    					// Testing stuff 
+    					
+    					for (Shout s : api.getShoutList()) {
+    						Toast.makeText(CommentActivity.this, "NEWSHOUTTEST" + s.getMessage(),Toast.LENGTH_LONG).show();
+    						commentMap.add(0, createShout("shout", s));
+    					//	shouts.add(0, s);
+    					}
+
+    					SimpleAdapter adapter = new SimpleAdapter(CommentActivity.this, commentMap,android.R.layout.simple_list_item_1, new String[] { "shout" },new int[] { android.R.id.text1 });
+    					lv.setAdapter(adapter);
+    				}
+    			}
+    		});
+    		return shoutList;
+    	}
+       
 }

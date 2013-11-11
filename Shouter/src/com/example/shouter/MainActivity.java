@@ -33,6 +33,8 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+
 //import com.androidtools.Networking;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
@@ -87,10 +89,10 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		initList();
+		View view = findViewById(R.id.refresh);
+		//initList();
 		updateLocation();
-
+		refresh(view);
 		lv = (ListView) findViewById(R.id.listView);
 
 		SimpleAdapter adapter = new SimpleAdapter(this, shoutMap,
@@ -107,11 +109,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 				// We know the View is a TextView so we can cast it
 
 				TextView clickedView = (TextView) view;
-				Toast.makeText(
-						MainActivity.this,
-						"Item with id [" + id + "] - Position [" + position
-								+ "] - Shout [" + clickedView.getText() + "]",
-						Toast.LENGTH_SHORT).show();
+				//Toast.makeText(MainActivity.this,"Item with id [" + id + "] - Position [" + position+ "] - Shout [" + clickedView.getText() + "]",Toast.LENGTH_SHORT).show();
 
 				Intent intent = new Intent(MainActivity.this,
 						CommentActivity.class);
@@ -123,6 +121,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 
 				intent.putExtra(EXTRA_MESSAGE, message);
 				intent.putExtra(EXTRA_ID, shouts.get(position).getID());
+				//Toast.makeText(MainActivity.this, "SetParent:" + shouts.get(position).getID(),Toast.LENGTH_LONG).show();
 				startActivity(intent);
 
 			}
@@ -168,9 +167,8 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		String lon = myShout.getLongitude();
 		String lat = myShout.getLatitude();
 
-		Toast.makeText(MainActivity.this,
-				"Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG)
-				.show();
+		Toast.makeText(MainActivity.this,"Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG).show();
+		
 		api = new ShouterAPI();
 		api.setDelegate(this);
 		try {
@@ -186,8 +184,6 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 			e.printStackTrace();
 		}
 
-		// refresh(view); // automatically refresh after posting message
-
 	}
 
 	/**
@@ -195,9 +191,11 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 * shouts
 	 * 
 	 * @author Josiah
-	 */
+	 */ 
 	public void refresh(View view) {
 
+		
+		
 		updateLocation();
 
 		List<Shout> newShouts = new ArrayList<Shout>();
@@ -215,23 +213,6 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		showDialog(DIALOG_LOADING);
 		api.getShout(lat, lon);
 		
-		//needs to wait for API.getshout to run
-		/*
-		newShouts = api.getShoutList();
-		Toast.makeText(MainActivity.this, "NEWSHOUTSIZE" + newShouts.size(),Toast.LENGTH_LONG).show();
-		
-		for (Shout s : newShouts) {
-			Toast.makeText(MainActivity.this, "NEWSHOUTTEST" + s.getMessage(),Toast.LENGTH_LONG).show();
-			shoutMap.add(0, createShout("shout", s));
-			shouts.add(0, s);
-		}
-		// shoutList.add(0,createShout("shout", new Shout("refresh",null)));
-
-		SimpleAdapter adapter = new SimpleAdapter(this, shoutMap,
-				android.R.layout.simple_list_item_1, new String[] { "shout" },
-				new int[] { android.R.id.text1 });
-		lv.setAdapter(adapter);
-*/
 	}
 
 	/**
@@ -319,40 +300,32 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 					dismissDialog(DIALOG_LOADING);
 
 				if (e != null)
-					Toast.makeText(MainActivity.this, e.toString(),Toast.LENGTH_LONG).show();
+					Toast.makeText(MainActivity.this, "Error Getting Shouts, Please Try Again",Toast.LENGTH_LONG).show();
 				else {
 					List<Shout> shoutList = new ArrayList();
 					Gson gson = new Gson();
-					// ObjectMapper mapper = new ObjectMapper();
 					try {
-						//JsonReader.setLenient(true);
 						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {};
 						shoutList = gson.fromJson(result.substring(10,result.length()-1), token.getType());
-						Collections.reverse(shoutList);
+						//Collections.reverse(shoutList);
 						api.setShoutList(shoutList);
 					} catch (Exception e1) {
 						//e1.printStackTrace();
-						Toast.makeText(MainActivity.this, "There was a catch" + e1.toString(),Toast.LENGTH_LONG).show();
+						Toast.makeText(MainActivity.this, "Error Please try again",Toast.LENGTH_LONG).show();
 					}
-					Toast.makeText(MainActivity.this, "GET" + result.substring(10, result.length()-1),Toast.LENGTH_LONG).show();
-					//Toast.makeText(MainActivity.this, "shoutlist size" + shoutList.size(),Toast.LENGTH_LONG).show();
-					//Toast.makeText(MainActivity.this, "teat" + api.getShoutList().get(1).getMessage(),Toast.LENGTH_LONG).show();
+					//Toast.makeText(MainActivity.this, "GET" + result.substring(10, result.length()-1),Toast.LENGTH_LONG).show();
 					// Testing stuff 
-					
+					shoutMap = new ArrayList<Map<String,String>>();
 					for (Shout s : api.getShoutList()) {
-						Toast.makeText(MainActivity.this, "NEWSHOUTTEST" + s.getMessage(),Toast.LENGTH_LONG).show();
 						shoutMap.add(0, createShout("shout", s));
 						shouts.add(0, s);
 					}
-					// shoutList.add(0,createShout("shout", new Shout("refresh",null)));
 
 					SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, shoutMap,android.R.layout.simple_list_item_1, new String[] { "shout" },new int[] { android.R.id.text1 });
 					lv.setAdapter(adapter);
 				}
 			}
 		});
-		//Toast.makeText(MainActivity.this, "shoutlist size" + shoutList.size(),Toast.LENGTH_LONG).show();
-		//Toast.makeText(MainActivity.this,"blah" + api.getShoutList().get(0).getMessage(),Toast.LENGTH_LONG).show();
 		return shoutList;
 	}
 
@@ -366,7 +339,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 *            - Return value from http call to api if failure Return logic
 	 *            for a call to the API for postShout
 	 */
-	public void onPostShoutReturn(ShouterAPI api, final String result,
+	public void onPostShoutReturn(final ShouterAPI api, final String result,
 			final Exception e) {
 		runOnUiThread(new Runnable() {
 			@Override
@@ -375,12 +348,30 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 					dismissDialog(DIALOG_LOADING);
 
 				if (e != null)
-					Toast.makeText(MainActivity.this, e.toString(),
-							Toast.LENGTH_LONG).show();
+					Toast.makeText(MainActivity.this, "Error Posting Shout, Please Try Again",Toast.LENGTH_LONG).show();
 				else {
-					Toast.makeText(MainActivity.this, "POST" + result,
-							Toast.LENGTH_LONG).show();
+					List<Shout> shoutList = new ArrayList();
+					Gson gson = new Gson();
+					try {
+						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {};
+						shoutList = gson.fromJson(result.substring(10,result.length()-1), token.getType());
+						//Collections.reverse(shoutList);
+						api.setShoutList(shoutList);
+					} catch (Exception e1) {
+						//e1.printStackTrace();
+						Toast.makeText(MainActivity.this, "Error, please try again",Toast.LENGTH_LONG).show();
+					}
+					//Toast.makeText(MainActivity.this, "GET" + result.substring(10, result.length()-1),Toast.LENGTH_LONG).show();
+					// Testing stuff 
+					shoutMap = new ArrayList<Map<String,String>>();
+					for (Shout s : api.getShoutList()) {
+						shoutMap.add(0, createShout("shout", s));
+						shouts.add(0, s);
+						//Toast.makeText(this, "Just received: " + s.getID(), Toast.LENGTH_LONG);
+					}
 
+					SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, shoutMap,android.R.layout.simple_list_item_1, new String[] { "shout" },new int[] { android.R.id.text1 });
+					lv.setAdapter(adapter);
 				}
 			}
 		});
@@ -451,7 +442,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		});
 	}
 
-	// Testing out ASync activities. STill no clue what is going on.
+	// Testing out ASync activities. May be used later on, as of now it is not used.
 	private class putShoutAsyncTask extends AsyncTask<Shout, Void, String> {
 		@Override
 		protected void onPreExecute() {
