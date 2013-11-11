@@ -129,8 +129,8 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 
 		});
 
-		api = new ShouterAPI();
-		api.setDelegate(this);
+		//api = new ShouterAPI();
+		//api.setDelegate(this);
 
 	}
 
@@ -170,7 +170,8 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		Toast.makeText(MainActivity.this,
 				"Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG)
 				.show();
-
+		api = new ShouterAPI();
+		api.setDelegate(this);
 		try {
 
 			showDialog(DIALOG_LOADING);
@@ -207,9 +208,13 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 			lon = Shout.convert(location.getLongitude());
 
 		}
-
+		api = new ShouterAPI();
+		api.setDelegate(this);
+		
 		showDialog(DIALOG_LOADING);
-		newShouts = api.getShout(lat, lon);
+		api.getShout(lat, lon);
+		
+		newShouts = api.getShoutList();
 		Toast.makeText(MainActivity.this, "NEWSHOUTSIZE" + newShouts.size(),
 				Toast.LENGTH_LONG).show();
 		for (Shout s : newShouts) {
@@ -312,31 +317,29 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 					dismissDialog(DIALOG_LOADING);
 
 				if (e != null)
-					Toast.makeText(MainActivity.this, e.toString(),
-							Toast.LENGTH_LONG).show();
+					Toast.makeText(MainActivity.this, e.toString(),Toast.LENGTH_LONG).show();
 				else {
 					List<Shout> shoutList = new ArrayList();
+					Gson gson = new Gson();
 					// ObjectMapper mapper = new ObjectMapper();
 					try {
-						Gson gson = new Gson();
-						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {
-						};
-						shoutList = gson.fromJson(result, token.getType());
+						//JsonReader.setLenient(true);
+						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {};
+						shoutList = gson.fromJson(result.substring(10,result.length()-1), token.getType());
 						Collections.reverse(shoutList);
 						api.setShoutList(shoutList);
-						// mapper.readValue(result, new
-						// TypeReference<List<Shout>>(){}));
 					} catch (Exception e1) {
-						e1.printStackTrace();
+						//e1.printStackTrace();
+						Toast.makeText(MainActivity.this, "There was a catch" + e1.toString(),Toast.LENGTH_LONG).show();
 					}
-					Toast.makeText(MainActivity.this, "GET" + result,
-							Toast.LENGTH_LONG).show();
+					Toast.makeText(MainActivity.this, "GET" + result.substring(10, result.length()-1),Toast.LENGTH_LONG).show();
+					Toast.makeText(MainActivity.this, "shoutlist size" + shoutList.size(),Toast.LENGTH_LONG).show();
+					Toast.makeText(MainActivity.this, "teat" + api.getShoutList().get(1).getMessage(),Toast.LENGTH_LONG).show();
 				}
 			}
 		});
-		Toast.makeText(MainActivity.this,
-				"blah" + api.getShoutList().get(0).getMessage(),
-				Toast.LENGTH_LONG).show();
+		//Toast.makeText(MainActivity.this, "shoutlist size" + shoutList.size(),Toast.LENGTH_LONG).show();
+		//Toast.makeText(MainActivity.this,"blah" + api.getShoutList().get(0).getMessage(),Toast.LENGTH_LONG).show();
 		return shoutList;
 	}
 

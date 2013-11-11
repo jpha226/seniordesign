@@ -129,6 +129,7 @@ public class ShouterAPI {
 							String.class);
 					shoutList = delegate.onGetShoutReturn(ShouterAPI.this,
 							response.getBody(), null);
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 					delegate.onGetShoutReturn(ShouterAPI.this, null, e);
