@@ -33,7 +33,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.androidtools.networking.Networking;
+//import com.androidtools.Networking;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
 import com.google.android.gms.location.LocationListener;
@@ -62,7 +62,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 															// list
 	private List<Shout> innerShoutList = new ArrayList<Shout>();
 	private ShouterAPI api; // API to call
-	private RestTemplate REST = Networking.defaultRest();
+	private RestTemplate REST =com.androidtools.networking.Networking.defaultRest();
 	private static final String Shouter_URL = "http://shouterapi-env.elasticbeanstalk.com/shouter";
 
 	/* Dialogs */
@@ -155,6 +155,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		// Do something in response to button
 		EditText editText = (EditText) findViewById(R.id.edit_message);
 		String message = editText.getText().toString();
+		editText.setText("");
 
 		updateLocation();
 
