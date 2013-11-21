@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -19,11 +20,16 @@ import org.springframework.web.client.RestTemplate;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -35,9 +41,21 @@ import android.widget.Toast;
 
 
 
+
+
+
+
+
+
+
+
+
 //import com.androidtools.Networking;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.location.LocationListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.*;
@@ -49,28 +67,51 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 
 	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE"; // message
 	public final static String EXTRA_ID = "com.example.shouter.ID"; // id of
-																	// shout
-	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+																	
 	private static final int GPS_RESOLUTION = 1;
 	private UserLocation userLocation; // For finding current location
 	private static Location location; // current location of user
-	private List<Map<String, String>> shoutMap = new ArrayList<Map<String, String>>(); // Maintains
-																						// list
-																						// of
-																						// shout
+	private List<Map<String, String>> shoutMap = new ArrayList<Map<String, String>>(); // Maintains																					// shout
 																						// messages
 	private List<Shout> shouts = new ArrayList<Shout>(); // Maintains the actual
 															// shouts in the
 															// list
 	private List<Shout> innerShoutList = new ArrayList<Shout>();
 	private ShouterAPI api; // API to call
-	private RestTemplate REST =com.androidtools.networking.Networking.defaultRest();
+	private RestTemplate REST =com.androidtools.Networking.defaultRest();
 	private static final String Shouter_URL = "http://shouterapi-env.elasticbeanstalk.com/shouter";
 
 	/* Dialogs */
 	public static final int DIALOG_LOADING = 0;
+	
+	
+    public static final String PROPERTY_REG_ID = "registration_id";
+    private static final String PROPERTY_APP_VERSION = "appVersion";
+	private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 	private ListView lv; // The list
 
+	/**
+     * Substitute you own sender ID here. This is the project number you got
+     * from the API Console, as described in "Getting Started."
+     */
+    String SENDER_ID = "Your-Sender-ID";
+
+    /**
+     * Tag used on log messages.
+     */
+    static final String TAG = "GCMDemo";
+
+    TextView mDisplay;
+    GoogleCloudMessaging gcm;
+    AtomicInteger msgId = new AtomicInteger();
+    SharedPreferences prefs;
+    Context context;
+
+    String regid;
+	
+	
+	
+	
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		ProgressDialog dialog = null;
@@ -88,9 +129,25 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.activity_main);
 		View view = findViewById(R.id.refresh);
-		//initList();
+		
+		context = getApplicationContext();
+		
+		gcm = GoogleCloudMessaging.getInstance(this);
+        
+		
+		regid = getRegistrationId(context);
+
+        if (regid.isEmpty()) {
+            registerInBackground();
+      
+    	} else {
+    		Log.i(TAG, "No valid Google Play Services APK found.");
+    	}
+		
+		
 		updateLocation();
 		refresh(view);
 		lv = (ListView) findViewById(R.id.listView);
@@ -113,8 +170,6 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 
 				Intent intent = new Intent(MainActivity.this,
 						CommentActivity.class);
-				// EditText editText = (EditText)
-				// findViewById(R.id.edit_message);
 				String message = (String) clickedView.getText();
 
 				updateLocation();
@@ -133,6 +188,11 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 
 	}
 
+	protected void onResume() {
+	    super.onResume();
+	    checkPlayServices();
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -484,4 +544,60 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 						Toast.LENGTH_SHORT).show();
 		}
 	};
+	
+	/**
+	 * Check the device to make sure it has the Google Play Services APK. If
+	 * it doesn't, display a dialog that allows users to download the APK from
+	 * the Google Play Store or enable it in the device's system settings.
+	 */
+	private boolean checkPlayServices() {
+	    int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+	    if (resultCode != ConnectionResult.SUCCESS) {
+	        if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+	            GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+	                    PLAY_SERVICES_RESOLUTION_REQUEST).show();
+	        } else {
+	            Log.i(TAG, "This device is not supported.");
+	            finish();
+	        }
+	        return false;
+	    }
+	    return true;
+	}
+
+	private String getRegistrationId(Context context) {
+	    final SharedPreferences prefs = getGCMPreferences(context);
+	    String registrationId = prefs.getString(PROPERTY_REG_ID, "");
+	    if (registrationId.isEmpty()) {
+	        Log.i(TAG, "Registration not found.");
+	        return "";
+	    }
+	    // 
+	    
+	    int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
+	    int currentVersion = getAppVersion(context);
+	
+	    if (registeredVersion != currentVersion) {
+	        Log.i(TAG, "App version changed.");
+	        return "";
+	    }
+	    return registrationId;
+	}
+	
+	private SharedPreferences getGCMPreferences(Context context) {
+	    // This sample app persists the registration ID in shared preferences, but
+	    // how you store the regID in your app is up to you.
+	    return getSharedPreferences(MainActivity.class.getSimpleName(),
+	            Context.MODE_PRIVATE);
+	}
+
+	private static int getAppVersion(Context context) {
+	    try {
+	        PackageInfo packageInfo = context.getPackageManager()
+	                .getPackageInfo(context.getPackageName(), 0);
+	        return packageInfo.versionCode;
+	    } catch (NameNotFoundException e) {throw new RuntimeException("Could not get package name: " +  e);}
+	}
+	
+
 }
