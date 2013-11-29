@@ -50,6 +50,9 @@ import android.widget.Toast;
 
 
 
+
+
+
 //import com.androidtools.Networking;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
@@ -99,7 +102,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
     /**
      * Tag used on log messages.
      */
-    static final String TAG = "GCMDemo";
+    static final String TAG = "GCMShout";
 
     TextView mDisplay;
     GoogleCloudMessaging gcm;
@@ -182,9 +185,6 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 			}
 
 		});
-
-		//api = new ShouterAPI();
-		//api.setDelegate(this);
 
 	}
 
@@ -587,17 +587,74 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	private SharedPreferences getGCMPreferences(Context context) {
 	    // This sample app persists the registration ID in shared preferences, but
 	    // how you store the regID in your app is up to you.
-	    return getSharedPreferences(MainActivity.class.getSimpleName(),
+	    
+		return getSharedPreferences(MainActivity.class.getSimpleName(),
 	            Context.MODE_PRIVATE);
 	}
 
 	private static int getAppVersion(Context context) {
 	    try {
-	        PackageInfo packageInfo = context.getPackageManager()
-	                .getPackageInfo(context.getPackageName(), 0);
+	        PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
 	        return packageInfo.versionCode;
 	    } catch (NameNotFoundException e) {throw new RuntimeException("Could not get package name: " +  e);}
 	}
 	
+	/**
+	 * Registers the application with GCM servers asynchronously.
+	 * <p>
+	 * Stores the registration ID and app versionCode in the application's
+	 * shared preferences.
+	 */
+	private void registerInBackground() {
+	    
+		new AsyncTask<Object, Object, Object>() {
+	        @Override
+	        protected String doInBackground(Object... params) {
+	            String msg = "";
+	            try {
+	                if (gcm == null) {
+	                    gcm = GoogleCloudMessaging.getInstance(context);
+	                }
+	                regid = gcm.register(SENDER_ID);
+	                msg = "Device registered, registration ID=" + regid;
+
+	                sendRegistrationIdToBackend();
+
+
+	                // Persist the regID - no need to register again.
+	                storeRegistrationId(context, regid);
+	            } catch (IOException ex) {
+	                msg = "Error :" + ex.getMessage();
+	                // If there is an error, don't just keep trying to register.
+	                // Require the user to click a button again, or perform
+	                // exponential back-off.
+	            }
+	            return msg;
+	        }
+	        
+	        protected void onPostExecute(String msg) {
+	            mDisplay.append(msg + "\n");
+	        }
+
+			
+	    }.execute(null, null, null);
+	    
+	}
+	
+	private void storeRegistrationId(Context context, String regId) {
+	    
+		final SharedPreferences prefs = getGCMPreferences(context);
+	    int appVersion = getAppVersion(context);
+	    
+	    Log.i(TAG, "Saving regId on app version " + appVersion);
+	    SharedPreferences.Editor editor = prefs.edit();
+	    
+	    editor.putString(PROPERTY_REG_ID, regId);
+	    editor.putInt(PROPERTY_APP_VERSION, appVersion);
+	    editor.commit();
+	
+	}
+	
+	private void sendRegistrationIdToBackend() {}
 
 }
