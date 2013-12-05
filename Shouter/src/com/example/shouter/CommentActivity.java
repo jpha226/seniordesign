@@ -38,9 +38,8 @@ import android.widget.Toast;
 public class CommentActivity extends Activity implements ShouterAPIDelegate{
 
         public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE";
+        static final int POST_REQUEST = 1;
         private static final int GPS_RESOLUTION = 1;
-        private UserLocation userLocation;
-        private static Location location;
         List<Map<String,String>> commentMap = new ArrayList<Map<String,String>>();
         private ShouterAPI api;
         /* Dialogs */
@@ -81,8 +80,6 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 api = new ShouterAPI();
                 api.setDelegate(this);
                 
-                updateLocation();
-                
                 View view = findViewById(R.id.postComment);
                 
                // initList();
@@ -92,12 +89,10 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 lv.setAdapter(adapter);
                 
                 refresh(view);
-
                 
                 // Show the Up button in the action bar.
                 setupActionBar(); // Josiah was here
-                
-        
+                        
         }
 
         /**
@@ -141,15 +136,14 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
          *  The message will also be added to the displayed shouts
          */
         public void postComment(View view){
-                // Do something in response to button
                 
-                EditText editText = (EditText) findViewById(R.id.edit_comment);
-                String message = editText.getText().toString();
-                editText.setText("");
+                Intent intent = new Intent(CommentActivity.this, PostActivity.class);
+                      
+                startActivityForResult(intent, POST_REQUEST);
                 
-                updateLocation();
+                Location loc = Utility.updateLocation(this);
                 
-                Shout myShout = new Shout(message, location);
+                /*Shout myShout = new Shout(message, loc);
                 String id = Secure.getString(this.getContentResolver(),Secure.ANDROID_ID); 
                 
                 myShout.setID(id);
@@ -167,7 +161,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                         
                 } catch (JsonGenerationException e) {e.printStackTrace();} catch (JsonMappingException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();}
                 
-                
+                */
         }
         
         
@@ -175,8 +169,6 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
          * 
          */
         public void refresh(View view){
-                
-                updateLocation();
                 
                 List<Shout> newShouts = new ArrayList<Shout>();
                 //Toast.makeText(CommentActivity.this, "ParentId of get: " +shout_id,Toast.LENGTH_LONG).show();
@@ -186,40 +178,40 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
               
         }
 
-//Use hashmaps to populate list. Can be expanded on once shout structure has been defined.
-        private HashMap<String, String> createShout(String name, Shout shout){
-                
-                HashMap<String, String> item = new HashMap<String, String>();
-                item.put(name, shout.toString());
-                return item;
-                
-        }
-
-        private void updateLocation(){
-                
-                userLocation = new UserLocation(this, GPS_RESOLUTION);
-                
-                
-                userLocation.requestLocationUpdates(userLocation.defaultRequest(), new LocationListener(){
-                        
-                        @Override
-                        public void onLocationChanged(Location loc) {
+        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        	    
+        	if (requestCode == POST_REQUEST) {
+        	
+        	        if (resultCode == RESULT_OK) {
+        	                    	
+        	        	String message = data.getStringExtra(PostActivity.EXTRA_MESSAGE);
         
-                                userLocation.disconnect();
+        	        	Location loc = Utility.updateLocation(this);
+                        
+                        Shout myShout = new Shout(message, loc);
+                        String id = Secure.getString(this.getContentResolver(),Secure.ANDROID_ID); 
+                        
+                        myShout.setID(id);
+                        myShout.setParent(shout_id);
+                        
+                        String lon = myShout.getLongitude();
+                        String lat = myShout.getLatitude();
+                        
+                        //Toast.makeText(this, "Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG).show();
+                        //Toast.makeText(CommentActivity.this, "ParentId:" + myShout.getParent(),Toast.LENGTH_LONG).show();
+                        try {
                                 
-                                if (loc != null){
-                                        
-                                        location = loc;
-                                        
-                                }
+                                showDialog(DIALOG_LOADING);
+                                api.postComment(myShout);
                                 
-                        }
-
-                        });
+                        } catch (JsonGenerationException e) {e.printStackTrace();} catch (JsonMappingException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();}
                 
-                
+        	        }
+        	    
+        	}
         }
-     
+
+             
         /**
          * @author Craig
          * @param api - API wrapper used to make certain call to api
@@ -255,7 +247,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 					// Testing stuff 
                 					commentMap = new ArrayList<Map<String,String>>();
                 					for (Shout s : api.getShoutList()) {
-                						commentMap.add(0, createShout("shout", s));
+                						commentMap.add(0, Utility.createShout("shout", s));
                 						//shouts.add(0, s);
                 					}
 
@@ -299,7 +291,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 					// Testing stuff 
                 					commentMap = new ArrayList<Map<String,String>>();
                 					for (Shout s : api.getShoutList()) {
-                						commentMap.add(0, createShout("shout", s));
+                						commentMap.add(0, Utility.createShout("shout", s));
                 						//shouts.add(0, s);
                 					}
 
@@ -358,7 +350,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
     					
     					for (Shout s : api.getShoutList()) {
     						Toast.makeText(CommentActivity.this, "NEWSHOUTTEST" + s.getMessage(),Toast.LENGTH_LONG).show();
-    						commentMap.add(0, createShout("shout", s));
+    						commentMap.add(0, Utility.createShout("shout", s));
     					//	shouts.add(0, s);
     					}
 

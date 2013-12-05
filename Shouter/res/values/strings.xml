@@ -14,5 +14,6 @@
     <string name="title_activity_comment">CommentActivity</string>
     <string name="title_activity_com">ComActivity</string>
     <string name="button_comment">Comment</string>
+    <string name="title_activity_post">PostActivity</string>
 
 </resources>

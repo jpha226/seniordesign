@@ -57,8 +57,39 @@ public class ShouterAPI {
 	 *            - User defined userName to be linked with their ID Not
 	 *            implemented yet, to come with phase 2
 	 */
-	public void register(String phoneID, String userName) {
+	public void register(final String phoneID, final String userName, final String regID) {
 
+		path = "/api/user/create";
+
+		executor.submit(new Runnable() {
+			@Override
+			public void run() {
+				ResponseEntity<String> response = null;
+				try {
+					HttpHeaders headers = new HttpHeaders();
+
+					HttpEntity<String> request = new HttpEntity<String>(headers);
+					// TODO: Need to seperate Location into long and lat
+					String url = Shouter_URL + path + "?phoneId="
+							+ phoneID + "&message=";
+							//+ message.getMessage() + "&latitude="
+							//+ message.getLatitude() + "&longitude="
+							//+ message.getLongitude() + "&parentId="
+							//+ message.getParent();
+					// Post Entity to URL
+					response = REST.exchange(url, HttpMethod.POST, request,
+							String.class);
+					delegate.onPostShoutReturn(ShouterAPI.this,
+							response.getBody(), null);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+					delegate.onPostShoutReturn(ShouterAPI.this, null, e);
+				}
+
+			}
+		});
+		
 	}
 
 	/**

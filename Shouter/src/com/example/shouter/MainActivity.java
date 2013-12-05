@@ -97,7 +97,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
      * Substitute you own sender ID here. This is the project number you got
      * from the API Console, as described in "Getting Started."
      */
-    String SENDER_ID = "Your-Sender-ID";
+    String SENDER_ID = "668201981322";
 
     /**
      * Tag used on log messages.
@@ -111,9 +111,6 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
     Context context;
 
     String regid;
-	
-	
-	
 	
 	@Override
 	protected Dialog onCreateDialog(int id) {
@@ -138,20 +135,20 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		
 		context = getApplicationContext();
 		
-		gcm = GoogleCloudMessaging.getInstance(this);
+		//gcm = GoogleCloudMessaging.getInstance(this);
         
 		
-		regid = getRegistrationId(context);
+		//regid = getRegistrationId(context);
 
         if (regid.isEmpty()) {
-            registerInBackground();
+          //  registerInBackground();
       
     	} else {
     		Log.i(TAG, "No valid Google Play Services APK found.");
     	}
 		
 		
-		updateLocation();
+		//updateLocation();
 		refresh(view);
 		lv = (ListView) findViewById(R.id.listView);
 
@@ -175,7 +172,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 						CommentActivity.class);
 				String message = (String) clickedView.getText();
 
-				updateLocation();
+				//updateLocation();
 
 				intent.putExtra(EXTRA_MESSAGE, message);
 				intent.putExtra(EXTRA_ID, shouts.get(position).getID());
@@ -254,8 +251,6 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 */ 
 	public void refresh(View view) {
 
-		
-		
 		updateLocation();
 
 		List<Shout> newShouts = new ArrayList<Shout>();
@@ -502,7 +497,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		});
 	}
 
-	// Testing out ASync activities. May be used later on, as of now it is not used.
+	/*/ Testing out ASync activities. May be used later on, as of now it is not used.
 	private class putShoutAsyncTask extends AsyncTask<Shout, Void, String> {
 		@Override
 		protected void onPreExecute() {
@@ -544,7 +539,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 						Toast.LENGTH_SHORT).show();
 		}
 	};
-	
+*/	
 	/**
 	 * Check the device to make sure it has the Google Play Services APK. If
 	 * it doesn't, display a dialog that allows users to download the APK from
@@ -566,13 +561,13 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	}
 
 	private String getRegistrationId(Context context) {
-	    final SharedPreferences prefs = getGCMPreferences(context);
+	    
+		final SharedPreferences prefs = getGCMPreferences(context);
 	    String registrationId = prefs.getString(PROPERTY_REG_ID, "");
 	    if (registrationId.isEmpty()) {
 	        Log.i(TAG, "Registration not found.");
 	        return "";
-	    }
-	    // 
+	    } 
 	    
 	    int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
 	    int currentVersion = getAppVersion(context);
@@ -604,7 +599,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 * <p>
 	 * Stores the registration ID and app versionCode in the application's
 	 * shared preferences.
-	 */
+	 *//*
 	private void registerInBackground() {
 	    
 		new AsyncTask<Object, Object, Object>() {
@@ -619,7 +614,6 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	                msg = "Device registered, registration ID=" + regid;
 
 	                sendRegistrationIdToBackend();
-
 
 	                // Persist the regID - no need to register again.
 	                storeRegistrationId(context, regid);
@@ -640,7 +634,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	    }.execute(null, null, null);
 	    
 	}
-	
+*/	
 	private void storeRegistrationId(Context context, String regId) {
 	    
 		final SharedPreferences prefs = getGCMPreferences(context);
@@ -655,6 +649,11 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	
 	}
 	
-	private void sendRegistrationIdToBackend() {}
+	private void sendRegistrationIdToBackend() {
+
+		String android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
+		api.register(android_id, "", regid);
+	
+	}
 
 }
