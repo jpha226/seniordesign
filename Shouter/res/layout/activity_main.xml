@@ -24,7 +24,7 @@
         android:layout_alignParentLeft="true"
         android:background="#2E64FE"
         android:layout_marginRight="2dp"
-        android:onClick="postMessage"/>
+        android:onClick="postShout"/>
                 
     <Button
         android:id = "@+id/refresh"

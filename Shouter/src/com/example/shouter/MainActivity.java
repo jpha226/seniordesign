@@ -53,6 +53,8 @@ import android.widget.Toast;
 
 
 
+
+
 //import com.androidtools.Networking;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
@@ -70,6 +72,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 
 	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE"; // message
 	public final static String EXTRA_ID = "com.example.shouter.ID"; // id of
+	public final static String EXTRA_INT = "com.example.shout.INT";
 																	
 	private static final int GPS_RESOLUTION = 1;
 	private UserLocation userLocation; // For finding current location
@@ -103,6 +106,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
      * Tag used on log messages.
      */
     static final String TAG = "GCMShout";
+	private static final int POST_REQUEST = 0;
 
     TextView mDisplay;
     GoogleCloudMessaging gcm;
@@ -140,12 +144,12 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		
 		//regid = getRegistrationId(context);
 
-        if (regid.isEmpty()) {
+        //if (regid.isEmpty()) {
           //  registerInBackground();
       
-    	} else {
-    		Log.i(TAG, "No valid Google Play Services APK found.");
-    	}
+    	//} else {
+    		//Log.i(TAG, "No valid Google Play Services APK found.");
+    	//}
 		
 		
 		//updateLocation();
@@ -187,7 +191,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 
 	protected void onResume() {
 	    super.onResume();
-	    checkPlayServices();
+	    //checkPlayServices();
 	}
 	
 	@Override
@@ -206,14 +210,19 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 * @param view
 	 *            The current view that function is called from
 	 */
-	public void postMessage(View view) {
+	public void postShout(View view) {
 
 		// Do something in response to button
 		EditText editText = (EditText) findViewById(R.id.edit_message);
 		String message = editText.getText().toString();
 		editText.setText("");
 
-		updateLocation();
+        Intent intent = new Intent(MainActivity.this, PostActivity.class);
+        intent.putExtra(EXTRA_INT, PostActivity.MAIN_ACTIVITY);
+        startActivityForResult(intent, POST_REQUEST);
+
+		
+/*		updateLocation();
 
 		Shout myShout = new Shout(message, location);
 
@@ -240,8 +249,46 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+*/
 	}
+	
+	 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+ 	    
+     	
+	        if (resultCode == RESULT_OK) {
+	                    	
+	        	String message = data.getStringExtra(PostActivity.EXTRA_MESSAGE);
+
+	        	Location loc = Utility.updateLocation(this);
+
+	    		Shout myShout = new Shout(message, loc);
+
+	    		String android_id = Secure.getString(this.getContentResolver(),
+	    				Secure.ANDROID_ID);
+	    		myShout.setID(android_id);
+
+	    		String lon = myShout.getLongitude();
+	    		String lat = myShout.getLatitude();
+
+	    		Toast.makeText(MainActivity.this,"Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG).show();
+	    		
+	    		api = new ShouterAPI();
+	    		api.setDelegate(this);
+	    		try {
+
+	    			showDialog(DIALOG_LOADING);
+	    			api.postShout(myShout);
+	    		
+	    		} catch (JsonGenerationException e) {
+	    			e.printStackTrace();
+	    		} catch (JsonMappingException e) {
+	    			e.printStackTrace();
+	    		} catch (IOException e) {
+	    			e.printStackTrace();
+	    		}     
+	        }
+	   
+}
 
 	/**
 	 * This function will pull shouts from the database and update displayed

@@ -90,7 +90,7 @@ int string auth_client_needs_update_title 0x7f060017
 int string auth_client_play_services_err_notification_msg 0x7f060018
 int string auth_client_requested_by_msg 0x7f060019
 int string auth_client_using_bad_version_title 0x7f060014
-int string button_comment 0x7f060026
+int string button_comment 0x7f060027
 int string button_refresh 0x7f060020
 int string button_send 0x7f06001f
 int string comment 0x7f06001e
@@ -117,11 +117,12 @@ int string common_signin_button_text 0x7f060012
 int string common_signin_button_text_long 0x7f060013
 int string edit_message 0x7f06001d
 int string hello_world 0x7f06001c
-int string loading 0x7f060023
-int string title_activity_com 0x7f060025
-int string title_activity_comment 0x7f060024
-int string title_activity_display_message 0x7f060022
-int string title_activity_post 0x7f060027
+int string loading 0x7f060024
+int string post_send 0x7f060022
+int string title_activity_com 0x7f060026
+int string title_activity_comment 0x7f060025
+int string title_activity_display_message 0x7f060023
+int string title_activity_post 0x7f060028
 int style AppBaseTheme 0x7f090000
 int style AppTheme 0x7f090001
 int[] styleable AdsAttrs { 0x7f010000, 0x7f010001 }

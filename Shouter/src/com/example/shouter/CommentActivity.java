@@ -38,6 +38,7 @@ import android.widget.Toast;
 public class CommentActivity extends Activity implements ShouterAPIDelegate{
 
         public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE";
+        public final static String EXTRA_INT = "com.example.shout.INT";
         static final int POST_REQUEST = 1;
         private static final int GPS_RESOLUTION = 1;
         List<Map<String,String>> commentMap = new ArrayList<Map<String,String>>();
@@ -138,30 +139,8 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
         public void postComment(View view){
                 
                 Intent intent = new Intent(CommentActivity.this, PostActivity.class);
-                      
+                intent.putExtra(EXTRA_INT, PostActivity.COMMENT_ACTIVITY);      
                 startActivityForResult(intent, POST_REQUEST);
-                
-                Location loc = Utility.updateLocation(this);
-                
-                /*Shout myShout = new Shout(message, loc);
-                String id = Secure.getString(this.getContentResolver(),Secure.ANDROID_ID); 
-                
-                myShout.setID(id);
-                myShout.setParent(shout_id);
-                
-                String lon = myShout.getLongitude();
-                String lat = myShout.getLatitude();
-                
-                //Toast.makeText(this, "Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG).show();
-                //Toast.makeText(CommentActivity.this, "ParentId:" + myShout.getParent(),Toast.LENGTH_LONG).show();
-                try {
-                        
-                        showDialog(DIALOG_LOADING);
-                        api.postComment(myShout);
-                        
-                } catch (JsonGenerationException e) {e.printStackTrace();} catch (JsonMappingException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();}
-                
-                */
         }
         
         
@@ -180,7 +159,6 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 
         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         	    
-        	if (requestCode == POST_REQUEST) {
         	
         	        if (resultCode == RESULT_OK) {
         	                    	
@@ -196,9 +174,8 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                         
                         String lon = myShout.getLongitude();
                         String lat = myShout.getLatitude();
-                        
-                        //Toast.makeText(this, "Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG).show();
-                        //Toast.makeText(CommentActivity.this, "ParentId:" + myShout.getParent(),Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
                         try {
                                 
                                 showDialog(DIALOG_LOADING);
@@ -207,8 +184,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                         } catch (JsonGenerationException e) {e.printStackTrace();} catch (JsonMappingException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();}
                 
         	        }
-        	    
-        	}
+        	   
         }
 
              

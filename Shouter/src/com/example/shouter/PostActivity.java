@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.Menu;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class PostActivity extends Activity {
 
@@ -25,6 +27,10 @@ public class PostActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_post);
 	
+		Intent intent = getIntent();
+        parent = intent.getIntExtra(MainActivity.EXTRA_INT, 0);
+
+		
 	}
 
 	@Override
@@ -35,11 +41,11 @@ public class PostActivity extends Activity {
 	}
 	
 	
-	public void postMessage(){
+	public void postMessage(View view){
 		
 		EditText editText = (EditText) findViewById(R.id.edit_message);
         String message = editText.getText().toString();
-
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         Intent intent;
         
         if(parent == this.MAIN_ACTIVITY)
@@ -50,8 +56,8 @@ public class PostActivity extends Activity {
 		intent.putExtra(EXTRA_MESSAGE, message);
 		
 		setResult(Activity.RESULT_OK, intent);
-		
-		finishActivity(CommentActivity.POST_REQUEST);
+		finish();
+		//finishActivity(CommentActivity.POST_REQUEST);
 
         
 	}
