@@ -7,5 +7,7 @@
 	<classpathentry exported="true" kind="lib" path="/AndroidTools/bin/androidtools.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/AndroidTools"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre7"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

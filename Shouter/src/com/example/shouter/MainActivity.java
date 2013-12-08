@@ -2,14 +2,12 @@ package com.example.shouter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -40,13 +38,17 @@ import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
 import com.google.android.gms.location.LocationListener;
 import com.google.gson.Gson;
-import com.google.gson.reflect.*;
+import com.google.gson.reflect.TypeToken;
+
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.viewdelegates.AbsListViewDelegate;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends Activity implements ShouterAPIDelegate {// implements
 																			// GooglePlayServicesClient.ConnectionCallbacks,
 																			// GooglePlayServicesClient.OnConnectionFailedListener{
-
+	private PullToRefreshLayout mPullToRefreshLayout;
 	public final static String EXTRA_MESSAGE = "com.example.shouter.MESSAGE"; // message
 	public final static String EXTRA_ID = "com.example.shouter.ID"; // id of
 																	// shout
@@ -70,6 +72,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	/* Dialogs */
 	public static final int DIALOG_LOADING = 0;
 	private ListView lv; // The list
+	private PullToRefreshLayout ptrl; 
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
@@ -93,7 +96,12 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		//initList();
 		updateLocation();
 		refresh(view);
-		lv = (ListView) findViewById(R.id.listView);
+		
+		ptrl = (PullToRefreshLayout) findViewById(R.id.ptr_layout);
+		ActionBarPullToRefresh.from(this).allChildrenArePullable().setup(ptrl);
+		
+		
+		//lv = (ListView) findViewById(R.id.listView);
 
 		SimpleAdapter adapter = new SimpleAdapter(this, shoutMap,
 				android.R.layout.simple_list_item_1, new String[] { "shout" },
@@ -117,7 +125,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 				// findViewById(R.id.edit_message);
 				String message = (String) clickedView.getText();
 
-				updateLocation();
+				updateLocation(); 
 
 				intent.putExtra(EXTRA_MESSAGE, message);
 				intent.putExtra(EXTRA_ID, shouts.get(position).getID());
@@ -128,6 +136,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 
 		});
 
+		ActionBarPullToRefresh.from(this).allChildrenArePullable().useViewDelegate(ListView.class, new AbsListViewDelegate()).setup(ptrl);
 		//api = new ShouterAPI();
 		//api.setDelegate(this);
 
