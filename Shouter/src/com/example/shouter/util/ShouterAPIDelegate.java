@@ -14,4 +14,6 @@ public interface ShouterAPIDelegate {
 			Exception e);
 
 	public void onPostCommentReturn(ShouterAPI api, String result, Exception e);
+
+	public void onRegistrationReturn(ShouterAPI api, String result, Exception e);
 }

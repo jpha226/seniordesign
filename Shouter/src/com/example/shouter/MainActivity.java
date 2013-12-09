@@ -86,7 +86,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 															// list
 	private List<Shout> innerShoutList = new ArrayList<Shout>();
 	private ShouterAPI api; // API to call
-	private RestTemplate REST =com.androidtools.Networking.defaultRest();
+	private RestTemplate REST =com.androidtools.networking.Networking.defaultRest();
 	private static final String Shouter_URL = "http://shouterapi-env.elasticbeanstalk.com/shouter";
 
 	/* Dialogs */
@@ -144,8 +144,9 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		gcm = GoogleCloudMessaging.getInstance(this);
         
 		regid = getRegistrationId(context);
-
+		Toast.makeText(this, "regid:" + regid, Toast.LENGTH_LONG).show();
         if (regid.isEmpty()) {
+        	Toast.makeText(this, "past regid", Toast.LENGTH_LONG).show();
             registerInBackground();
       
     	} else {
@@ -209,9 +210,9 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	public void postShout(View view) {
 
 		// Do something in response to button
-		EditText editText = (EditText) findViewById(R.id.edit_message);
-		String message = editText.getText().toString();
-		editText.setText("");
+		//EditText editText = (EditText) findViewById(R.id.edit_message);
+		//String message = editText.getText().toString();
+		//editText.setText("");
 
         Intent intent = new Intent(MainActivity.this, PostActivity.class);
         intent.putExtra(EXTRA_INT, PostActivity.MAIN_ACTIVITY);
@@ -226,9 +227,8 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	        	String message = "not found";
 	        	message = data.getStringExtra(PostActivity.EXTRA_MESSAGE);
 
-	        	Location loc = Utility.updateLocation(this);
-
-	    		Shout myShout = new Shout(message, loc);
+	        	locationPost(message);
+	    		/*Shout myShout = new Shout(message, loc);
 	            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 
 	    		String android_id = Secure.getString(this.getContentResolver(),Secure.ANDROID_ID);
@@ -252,7 +252,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	    			e.printStackTrace();
 	    		} catch (IOException e) {
 	    			e.printStackTrace();
-	    		}     
+	    		} */    
 	        }
 	   
 }
@@ -263,44 +263,45 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 * 
 	 * @author Josiah
 	 */ 
-	public static void refresh(View view) {
+	public void refresh(View view) {
 
-		Location loc = Utility.updateLocation(this);
+		userLocation = new UserLocation(this, GPS_RESOLUTION);
 
-		List<Shout> newShouts = new ArrayList<Shout>();
-		String lat = "";
-		String lon = "";
+		userLocation.requestLocationUpdates(userLocation.defaultRequest(),
+				new LocationListener() {
 
-		if (location != null) {
-			lat = Shout.convert(loc.getLatitude());
-			lon = Shout.convert(loc.getLongitude());
+					@Override
+					public void onLocationChanged(Location loc) {
 
-		}
-		api = new ShouterAPI();
-		api.setDelegate(this);
-		
-		showDialog(DIALOG_LOADING);
-		api.getShout(lat, lon);
+						userLocation.disconnect();
+
+						if (loc != null) {
+
+							location = loc;
+							
+							List<Shout> newShouts = new ArrayList<Shout>();
+							String lat = "";
+							String lon = "";
+
+							if (location != null) {
+								lat = Shout.convert(loc.getLatitude());
+								lon = Shout.convert(loc.getLongitude());
+
+							}
+							api = new ShouterAPI();
+							api.setDelegate(MainActivity.this);
+							
+							showDialog(DIALOG_LOADING);
+							api.getShout(lat, lon);
+
+						}
+
+					}
+
+				});
 		
 	}
 
-	/**
-	 * Gets shouts and populates the list view
-	 * 
-	 * @author Craig
-	 */
-	private void initList() {
-
-		shoutMap.add(createShout("shout", new Shout("Test Shout 1", null)));
-		shoutMap.add(createShout("shout", new Shout(
-				"Just making sure this App is working", null)));
-		shoutMap.add(createShout("shout", new Shout("Woot Shouter", null)));
-		shoutMap.add(createShout("shout", new Shout("Still working", null)));
-		shoutMap.add(createShout("shout", new Shout("Test Shout 5", null)));
-		shoutMap.add(createShout("shout", new Shout("Test Shout 6", null)));
-		shoutMap.add(createShout("shout", new Shout("Test Shout 7", null)));
-
-	}
 
 	/**
 	 * @author Josiah and Craig
@@ -323,7 +324,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 * @author Josiah
 	 * @param none
 	 */
-	private void updateLocation() {
+	private void locationPost(final String message) {
 
 		userLocation = new UserLocation(this, GPS_RESOLUTION);
 
@@ -338,6 +339,32 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 						if (loc != null) {
 
 							location = loc;
+							
+							Shout myShout = new Shout(message, loc);
+				            //Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
+				    		String android_id = Secure.getString(MainActivity.this.getContentResolver(),Secure.ANDROID_ID);
+				    		myShout.setID(android_id);
+
+				    		String lon = myShout.getLongitude();
+				    		String lat = myShout.getLatitude();
+
+				    		Toast.makeText(MainActivity.this,"Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG).show();
+				    		
+				    		api = new ShouterAPI();
+				    		api.setDelegate(MainActivity.this);
+				    		try {
+
+				    			showDialog(DIALOG_LOADING);
+				    			api.postShout(myShout);
+				    		
+				    		} catch (JsonGenerationException e) {
+				    			e.printStackTrace();
+				    		} catch (JsonMappingException e) {
+				    			e.printStackTrace();
+				    		} catch (IOException e) {
+				    			e.printStackTrace();
+				    		} 
 
 						}
 
@@ -511,6 +538,24 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		});
 	}
 
+	public void onRegistrationReturn(ShouterAPI api, final String result,
+			final Exception e) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (!isFinishing())
+					dismissDialog(DIALOG_LOADING);
+
+				if (e != null)
+					Toast.makeText(MainActivity.this, "Error Registering",
+							Toast.LENGTH_SHORT).show();
+				else {
+					Toast.makeText(MainActivity.this, "Registration Return:"+result, Toast.LENGTH_LONG)
+							.show();
+				}
+			}
+		});
+	}
 	/*/ Testing out ASync activities. May be used later on, as of now it is not used.
 	private class putShoutAsyncTask extends AsyncTask<Shout, Void, String> {
 		@Override
@@ -575,7 +620,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	}
 
 	private String getRegistrationId(Context context) {
-	    
+	    Toast.makeText(this, "get regis", Toast.LENGTH_LONG).show();
 		final SharedPreferences prefs = getGCMPreferences(context);
 	    String registrationId = prefs.getString(PROPERTY_REG_ID, "");
 	    if (registrationId.isEmpty()) {
@@ -615,7 +660,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 * shared preferences.
 	 */
 	private void registerInBackground() {
-	    
+	    Toast.makeText(this, "register", Toast.LENGTH_LONG).show();
 		new AsyncTask<Object, Object, Object>() {
 	        @Override
 	        protected String doInBackground(Object... params) {
@@ -666,8 +711,11 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	private void sendRegistrationIdToBackend() {
 
 		String android_id = Secure.getString(this.getContentResolver(), Secure.ANDROID_ID);
+
+		api = new ShouterAPI();
+		api.setDelegate(MainActivity.this);
 		//Looper.prepare();
-        //Toast.makeText(this, "Sending regID to backend", Toast.LENGTH_LONG).show();
+       // Toast.makeText(this, "Sending regID to backend", Toast.LENGTH_LONG).show();
 		api.register(android_id, "first", "last", regid);
 
 	}

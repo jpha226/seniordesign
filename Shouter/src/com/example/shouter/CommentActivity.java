@@ -279,7 +279,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 	}
 
 
-
+        public void onRegistrationReturn(ShouterAPI api, final String result, final Exception e){}
         public void onPostShoutReturn(ShouterAPI api, final String result,
         		final Exception e) {
         	runOnUiThread(new Runnable() {

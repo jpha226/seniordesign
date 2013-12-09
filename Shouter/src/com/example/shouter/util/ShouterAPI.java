@@ -14,6 +14,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import android.widget.Toast;
+
+import com.example.shouter.MainActivity;
 import com.example.shouter.Shout;
 
 /**
@@ -27,7 +30,7 @@ public class ShouterAPI {
 
 	private ExecutorService executor;
 	private ShouterAPIDelegate delegate;
-	private RestTemplate REST = com.androidtools.Networking.defaultRest();
+	private RestTemplate REST = com.androidtools.networking.Networking.defaultRest();
 
 	private String path;
 
@@ -69,7 +72,6 @@ public class ShouterAPI {
 					HttpHeaders headers = new HttpHeaders();
 
 					HttpEntity<String> request = new HttpEntity<String>(headers);
-					// TODO: Need to seperate Location into long and lat
 					String url = Shouter_URL + path + "?phoneId="
 							+ phoneID + "&firstName="
 							+ first + "&lastName="
@@ -78,9 +80,12 @@ public class ShouterAPI {
 					// Post Entity to URL
 					response = REST.exchange(url, HttpMethod.POST, request,
 							String.class);
-
+					delegate.onRegistrationReturn(ShouterAPI.this,
+							response.getBody(), null);
 				} catch (Exception e) {
 					e.printStackTrace();
+					delegate.onRegistrationReturn(ShouterAPI.this,
+							null, e);
 				}
 				
 			}
@@ -135,7 +140,7 @@ public class ShouterAPI {
 	 *            - String of devices latitude
 	 * @param longitude
 	 *            - String of devices longitude
-	 * @return list of shouts that a within geagraphical boundry of current
+	 * @return list of shouts that a within geographical boundary of current
 	 *         location Function gets a list of shouts based on current location
 	 *         from the API
 	 */
