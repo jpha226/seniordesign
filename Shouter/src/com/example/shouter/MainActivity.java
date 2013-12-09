@@ -227,32 +227,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	        	String message = "not found";
 	        	message = data.getStringExtra(PostActivity.EXTRA_MESSAGE);
 
-	        	locationPost(message);
-	    		/*Shout myShout = new Shout(message, loc);
-	            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-
-	    		String android_id = Secure.getString(this.getContentResolver(),Secure.ANDROID_ID);
-	    		myShout.setID(android_id);
-
-	    		String lon = myShout.getLongitude();
-	    		String lat = myShout.getLatitude();
-
-	    		Toast.makeText(MainActivity.this,"Longitude: " + lon + " Latitude: " + lat, Toast.LENGTH_LONG).show();
-	    		
-	    		api = new ShouterAPI();
-	    		api.setDelegate(this);
-	    		try {
-
-	    			showDialog(DIALOG_LOADING);
-	    			api.postShout(myShout);
-	    		
-	    		} catch (JsonGenerationException e) {
-	    			e.printStackTrace();
-	    		} catch (JsonMappingException e) {
-	    			e.printStackTrace();
-	    		} catch (IOException e) {
-	    			e.printStackTrace();
-	    		} */    
+	        	locationPost(message);   
 	        }
 	   
 }
@@ -556,49 +531,6 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 			}
 		});
 	}
-	/*/ Testing out ASync activities. May be used later on, as of now it is not used.
-	private class putShoutAsyncTask extends AsyncTask<Shout, Void, String> {
-		@Override
-		protected void onPreExecute() {
-			showDialog(DIALOG_LOADING);
-		}
-
-		@Override
-		protected String doInBackground(Shout... message) {
-			String path = "/api/shout/create";
-			ResponseEntity<String> response;
-			try {
-				HttpHeaders headers = new HttpHeaders();
-				HttpEntity<String> request = new HttpEntity<String>(headers);
-
-				String url = Shouter_URL + path + "?phoneId="
-						+ message[0].getID() + "&message="
-						+ message[0].getMessage() + "&latitude="
-						+ message[0].getLatitude() + "&longitude="
-						+ message[0].getLongitude() + "&parentId="
-						+ message[0].getParent();
-				response = REST.exchange(url, HttpMethod.PUT, request,String.class);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-			return response.getBody();
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			if (!isFinishing())
-				dismissDialog(DIALOG_LOADING);
-
-			if (result == null)
-				Toast.makeText(MainActivity.this, "Error getting Shout",
-						Toast.LENGTH_LONG).show();
-			else
-				Toast.makeText(MainActivity.this, "PutShout" + result,
-						Toast.LENGTH_SHORT).show();
-		}
-	};
-*/	
 	/**
 	 * Check the device to make sure it has the Google Play Services APK. If
 	 * it doesn't, display a dialog that allows users to download the APK from
@@ -716,7 +648,8 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		api.setDelegate(MainActivity.this);
 		//Looper.prepare();
        // Toast.makeText(this, "Sending regID to backend", Toast.LENGTH_LONG).show();
-		api.register(android_id, "first", "last", regid);
+		//TODO: FIx android id, it is not 3
+		api.register("3", "first", "last", regid);
 
 	}
 
