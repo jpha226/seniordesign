@@ -1,7 +1,13 @@
 package com.example.shouter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import android.app.Activity;
+import android.location.Location;
+
+import com.google.android.gms.location.LocationListener;
 
 /**
  * 
@@ -10,36 +16,43 @@ import java.util.List;
  */
 public class Utility {
 
-	/**
-	 * @author Josiah
-	 * @param shout
-	 *            - The shout to be converted to JSON and pushed to the database
-	 *            Function pushes shout to database
-	 * @return
-	 */
-	public static void post(Shout shout) {
+	private static final int GPS_RESOLUTION = 1;
+	private static UserLocation userLocation;
+	private static Location location;
+	
+	public static Location updateLocation(Activity activity){
+        
+        userLocation = new UserLocation(activity, GPS_RESOLUTION);
+        
+        
+        userLocation.requestLocationUpdates(userLocation.defaultRequest(), new LocationListener(){
+                
+                @Override
+                public void onLocationChanged(Location loc) {
+
+                        userLocation.disconnect();
+                        
+                        if (loc != null){
+                                
+                                location = loc;
+                                
+                        }
+                        
+                }
+
+                });
+        
+        	return location;
 	}
 
-	/**
-	 * Function for accessing the API to refresh the posts the user sees
-	 * 
-	 * @return - A list of shouts that the user has not seen yet
-	 */
-	public static List<Shout> pull() {
+	public static HashMap<String, String> createShout(String name, Shout shout) {
 
-		Shout s = new Shout("This is a shout", null);
-		Shout a = new Shout("This is shout a!", null);
-
-		List<Shout> result = new ArrayList<Shout>();
-
-		result.add(s);
-		result.add(a);
-		return result;
+		//shouts.add(shout);
+		HashMap<String, String> item = new HashMap<String, String>();
+		item.put(name, shout.toString());
+		return item;
 
 	}
-
-	public static List<Shout> getChildren(String parentID) {
-		return null;
-	}
+	
 
 }

@@ -6,32 +6,24 @@
     android:padding="5dp"
     android:orientation="vertical">
 
-    <EditText android:id="@+id/edit_message"
-        android:layout_width="fill_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:background="#BDBDBD"
-        android:layout_marginBottom="5dp"
-        android:hint="@string/edit_message"/>  
-        
     <Button
         android:id="@+id/post" 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_send"
-        android:layout_below="@+id/edit_message"
+        android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/refresh"
         android:layout_alignParentLeft="true"
         android:background="#2E64FE"
         android:layout_marginRight="2dp"
-        android:onClick="postMessage"/>
+        android:onClick="postShout"/>
                 
     <Button
         android:id = "@+id/refresh"
         android:layout_width="165dp"
         android:layout_height="wrap_content"
         android:onClick="refresh"
-        android:layout_below="@+id/edit_message"
+        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:background="#2E64FE"
         android:layout_marginLeft="2dp"
@@ -41,11 +33,11 @@
              android:id="@+id/listView"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
+             android:layout_alignParentBottom="true"
              android:layout_below="@+id/post"
-             android:background="#A4A4A4"
-                  android:layout_marginTop="5dp"
-                  android:divider="@android:color/white"
-                  android:dividerHeight="2dp"
-             android:layout_alignParentBottom="true" />
+             android:layout_marginTop="5dp"
+             android:background="@android:color/white"
+             android:divider="@android:color/black"
+             android:dividerHeight="2dp" />
     
 </RelativeLayout>

@@ -9,10 +9,12 @@
     <string name="button_send">Shout</string>
     <string name="button_refresh">Refresh</string>
     <string name="comment_send">Post Comment</string>
+    <string name="post_send">Post Message</string>
     <string name="title_activity_display_message">MyMessage</string>
     <string name="loading">loading&#8230;</string>
     <string name="title_activity_comment">CommentActivity</string>
     <string name="title_activity_com">ComActivity</string>
     <string name="button_comment">Comment</string>
+    <string name="title_activity_post">PostActivity</string>
 
 </resources>

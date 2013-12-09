@@ -14,6 +14,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import android.widget.Toast;
+
+import com.example.shouter.MainActivity;
 import com.example.shouter.Shout;
 
 /**
@@ -57,8 +60,37 @@ public class ShouterAPI {
 	 *            - User defined userName to be linked with their ID Not
 	 *            implemented yet, to come with phase 2
 	 */
-	public void register(String phoneID, String userName) {
+	public void register(final String phoneID, final String first, final String last, final String regID) {
 
+		path = "/api/user/create";
+
+		executor.submit(new Runnable() {
+			@Override
+			public void run() {
+				ResponseEntity<String> response = null;
+				try {
+					HttpHeaders headers = new HttpHeaders();
+
+					HttpEntity<String> request = new HttpEntity<String>(headers);
+					String url = Shouter_URL + path + "?phoneId="
+							+ phoneID + "&firstName="
+							+ first + "&lastName="
+							+ last + "&registrationId="
+							+ regID;
+					// Post Entity to URL
+					response = REST.exchange(url, HttpMethod.POST, request,
+							String.class);
+					delegate.onRegistrationReturn(ShouterAPI.this,
+							response.getBody(), null);
+				} catch (Exception e) {
+					e.printStackTrace();
+					delegate.onRegistrationReturn(ShouterAPI.this,
+							null, e);
+				}
+				
+			}
+		});
+		
 	}
 
 	/**
@@ -108,7 +140,7 @@ public class ShouterAPI {
 	 *            - String of devices latitude
 	 * @param longitude
 	 *            - String of devices longitude
-	 * @return list of shouts that a within geagraphical boundry of current
+	 * @return list of shouts that a within geographical boundary of current
 	 *         location Function gets a list of shouts based on current location
 	 *         from the API
 	 */
