@@ -2,7 +2,6 @@ package com.example.shouter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import android.app.Activity;
@@ -28,34 +22,15 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Looper;
 import android.provider.Settings.Secure;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //import com.androidtools.Networking;
 import com.example.shouter.util.ShouterAPI;
@@ -65,7 +40,10 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.location.LocationListener;
 import com.google.gson.Gson;
-import com.google.gson.reflect.*;
+import com.google.gson.reflect.TypeToken;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends Activity implements ShouterAPIDelegate {// implements
@@ -86,7 +64,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 															// list
 	private List<Shout> innerShoutList = new ArrayList<Shout>();
 	private ShouterAPI api; // API to call
-	private RestTemplate REST =com.androidtools.Networking.defaultRest();
+	private RestTemplate REST =com.androidtools.networking.Networking.defaultRest();
 	private static final String Shouter_URL = "http://shouterapi-env.elasticbeanstalk.com/shouter";
 
 	/* Dialogs */
@@ -96,7 +74,8 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
 	private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-	private ListView lv; // The list
+	//private ListView lv; // The list
+	public PullToRefreshListView lv;
 
 	/**
      * Substitute you own sender ID here. This is the project number you got
@@ -137,7 +116,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_main);
-		View view = findViewById(R.id.refresh);
+		final View view = findViewById(R.id.refresh);
 		
 		context = getApplicationContext();
 		
@@ -156,11 +135,13 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		
 		//updateLocation();
 		refresh(view);
-		lv = (ListView) findViewById(R.id.listView);
-		shoutMap.add(0, createShout(new Shout("test shout", location)));
+		//lv = (ListView) findViewById(R.id.listView);
+		
+		lv = (PullToRefreshListView) findViewById(R.id.pull_refresh_list);
+		
 		SimpleAdapter adapter = new SimpleAdapter(this, shoutMap,
-				android.R.layout.simple_list_item_2, new String[] {"header", "shout"},
-				new int[] { android.R.id.text1, android.R.id.text2});
+				android.R.layout.simple_list_item_1, new String[] { "shout" },
+				new int[] { android.R.id.text1 });
 		lv.setAdapter(adapter);
 
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -169,10 +150,13 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 			public void onItemClick(AdapterView<?> parentAdapter, View view,
 					int position, long id) {
 
+				TextView clickedView = (TextView) view;
+
 				Intent intent = new Intent(MainActivity.this,
 						CommentActivity.class);
+				String message = (String) clickedView.getText();
 
-				intent.putExtra(EXTRA_MESSAGE, shouts.get(position).getMessage());
+				intent.putExtra(EXTRA_MESSAGE, message);
 				intent.putExtra(EXTRA_ID, shouts.get(position).getID());
 
 				startActivity(intent);
@@ -181,11 +165,19 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 
 		});
 
+		lv.setOnRefreshListener(new OnRefreshListener<ListView>() {
+		    @Override
+		    public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+		    	refresh(view);
+		        // Do work to refresh the list here.
+		        new GetDataTask().execute();
+		    }
+		});
 	}
 
 	protected void onResume() {
 	    super.onResume();
-	   // checkPlayServices();
+	    checkPlayServices();
 	}
 	
 	@Override
@@ -283,12 +275,11 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 *            The shout to be added to the list
 	 * @return
 	 */
-	private HashMap<String, String> createShout(Shout shout) {
+	private HashMap<String, String> createShout(String name, Shout shout) {
 
 		shouts.add(shout);
 		HashMap<String, String> item = new HashMap<String, String>();
-		item.put("shout", shout.getMessage());
-		item.put("header", "User 1");
+		item.put(name, shout.toString());
 		return item;
 
 	}
@@ -371,7 +362,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 				if (e != null)
 					Toast.makeText(MainActivity.this, "Error Getting Shouts, Please Try Again",Toast.LENGTH_LONG).show();
 				else {
-					List<Shout> shoutList = new ArrayList<Shout>();
+					List<Shout> shoutList = new ArrayList();
 					Gson gson = new Gson();
 					try {
 						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {};
@@ -386,7 +377,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 					// Testing stuff 
 					shoutMap = new ArrayList<Map<String,String>>();
 					for (Shout s : api.getShoutList()) {
-						shoutMap.add(0, createShout(s));
+						shoutMap.add(0, createShout("shout", s));
 						shouts.add(0, s);
 					}
 
@@ -434,7 +425,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 					// Testing stuff 
 					shoutMap = new ArrayList<Map<String,String>>();
 					for (Shout s : api.getShoutList()) {
-						shoutMap.add(0, createShout(s));
+						shoutMap.add(0, createShout("shout", s));
 						shouts.add(0, s);
 						//Toast.makeText(this, "Just received: " + s.getID(), Toast.LENGTH_LONG);
 					}
@@ -647,8 +638,25 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		//Looper.prepare();
        // Toast.makeText(this, "Sending regID to backend", Toast.LENGTH_LONG).show();
 		//TODO: FIx android id, it is not 3
-		api.register("3", "first", "last", regid);
+		api.register(android_id, "first", "last", regid);
 
 	}
-
+	private class GetDataTask extends AsyncTask<Void, Void, String[]> {
+        @Override
+        protected String[] doInBackground(Void... params) {
+                // Simulates a background job.
+                try {
+                        Thread.sleep(100);
+                } catch (InterruptedException e) {
+                }
+                String[] mStrings = null;
+				return mStrings;
+        }
+	    @Override
+	    protected void onPostExecute(String[] result) {
+	        // Call onRefreshComplete when the list has been refreshed.
+	        lv.onRefreshComplete();
+	        super.onPostExecute(result);
+	    }
+	}
 }
