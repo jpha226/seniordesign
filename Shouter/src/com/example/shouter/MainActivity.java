@@ -86,7 +86,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 															// list
 	private List<Shout> innerShoutList = new ArrayList<Shout>();
 	private ShouterAPI api; // API to call
-	private RestTemplate REST =com.androidtools.networking.Networking.defaultRest();
+	private RestTemplate REST =com.androidtools.Networking.defaultRest();
 	private static final String Shouter_URL = "http://shouterapi-env.elasticbeanstalk.com/shouter";
 
 	/* Dialogs */
@@ -157,10 +157,10 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		//updateLocation();
 		refresh(view);
 		lv = (ListView) findViewById(R.id.listView);
-
+		shoutMap.add(0, createShout(new Shout("test shout", location)));
 		SimpleAdapter adapter = new SimpleAdapter(this, shoutMap,
-				android.R.layout.simple_list_item_1, new String[] { "shout" },
-				new int[] { android.R.id.text1 });
+				android.R.layout.simple_list_item_2, new String[] {"header", "shout"},
+				new int[] { android.R.id.text1, android.R.id.text2});
 		lv.setAdapter(adapter);
 
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -169,13 +169,10 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 			public void onItemClick(AdapterView<?> parentAdapter, View view,
 					int position, long id) {
 
-				TextView clickedView = (TextView) view;
-
 				Intent intent = new Intent(MainActivity.this,
 						CommentActivity.class);
-				String message = (String) clickedView.getText();
 
-				intent.putExtra(EXTRA_MESSAGE, message);
+				intent.putExtra(EXTRA_MESSAGE, shouts.get(position).getMessage());
 				intent.putExtra(EXTRA_ID, shouts.get(position).getID());
 
 				startActivity(intent);
@@ -188,7 +185,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 
 	protected void onResume() {
 	    super.onResume();
-	    checkPlayServices();
+	   // checkPlayServices();
 	}
 	
 	@Override
@@ -286,11 +283,12 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 *            The shout to be added to the list
 	 * @return
 	 */
-	private HashMap<String, String> createShout(String name, Shout shout) {
+	private HashMap<String, String> createShout(Shout shout) {
 
 		shouts.add(shout);
 		HashMap<String, String> item = new HashMap<String, String>();
-		item.put(name, shout.toString());
+		item.put("shout", shout.getMessage());
+		item.put("header", "User 1");
 		return item;
 
 	}
@@ -373,7 +371,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 				if (e != null)
 					Toast.makeText(MainActivity.this, "Error Getting Shouts, Please Try Again",Toast.LENGTH_LONG).show();
 				else {
-					List<Shout> shoutList = new ArrayList();
+					List<Shout> shoutList = new ArrayList<Shout>();
 					Gson gson = new Gson();
 					try {
 						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {};
@@ -388,7 +386,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 					// Testing stuff 
 					shoutMap = new ArrayList<Map<String,String>>();
 					for (Shout s : api.getShoutList()) {
-						shoutMap.add(0, createShout("shout", s));
+						shoutMap.add(0, createShout(s));
 						shouts.add(0, s);
 					}
 
@@ -436,7 +434,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 					// Testing stuff 
 					shoutMap = new ArrayList<Map<String,String>>();
 					for (Shout s : api.getShoutList()) {
-						shoutMap.add(0, createShout("shout", s));
+						shoutMap.add(0, createShout(s));
 						shouts.add(0, s);
 						//Toast.makeText(this, "Just received: " + s.getID(), Toast.LENGTH_LONG);
 					}

@@ -6,7 +6,7 @@ import android.location.Location;
 
 public class Shout {
 
-	private String message, id, latitude, longitude, phoneId, parentID;
+	private String message, shout_id, latitude, longitude, phoneId, parentID;
 	private Timestamp time_stamp;
 
 	// Constructor
@@ -26,7 +26,7 @@ public class Shout {
 	public Shout(String m, Location loc, String p) {
 
 		message = m;
-		id = p;
+		shout_id = p;
 		if (loc != null) {
 			latitude = convert(loc.getLatitude());
 			longitude = convert(loc.getLongitude());
@@ -39,7 +39,7 @@ public class Shout {
 	}
 
 	public String getID() {
-		return id;
+		return shout_id;
 	}
 
 	public String getUser() {
@@ -68,7 +68,7 @@ public class Shout {
 	}
 
 	public void setID(String i) {
-		id = i;
+		shout_id = i;
 	}
 
 	public void setUser(String user) {

@@ -5,16 +5,14 @@
     android:padding="5dp"
     tools:context=".CommentActivity" >
 
-    
      <TextView
-        android:id="@+id/comment_text"
-        android:layout_width="fill_parent"
-        android:layout_height="100dp"
-        android:textSize="40sp"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="5dp"
-        android:background="#BDBDBD"
-        />
+         android:id="@+id/comment_text"
+         android:layout_width="fill_parent"
+         android:layout_height="100dp"
+         android:layout_alignParentTop="true"
+         android:layout_marginBottom="5dp"
+         android:background="@android:color/black"
+         android:textSize="40sp" />
     
      <Button 
         android:layout_width="fill_parent"
@@ -26,16 +24,13 @@
         android:onClick="postComment"/>
      
     <ListView
-             android:id="@+id/CommentListView"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content" 
-             android:layout_below="@+id/postComment"
-             android:divider="@android:color/black"
-             android:dividerHeight="2dp"
-             android:background="#AFAFAF"
-             android:layout_marginBottom="5dp"
-             />
-    
-    
+        android:id="@+id/CommentListView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/postComment"
+        android:layout_marginBottom="5dp"
+        android:background="@android:color/black"
+        android:divider="@android:color/white"
+        android:dividerHeight="2dp" />
 
 </RelativeLayout>

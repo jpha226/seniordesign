@@ -30,7 +30,7 @@ public class ShouterAPI {
 
 	private ExecutorService executor;
 	private ShouterAPIDelegate delegate;
-	private RestTemplate REST = com.androidtools.networking.Networking.defaultRest();
+	private RestTemplate REST = com.androidtools.Networking.defaultRest();
 
 	private String path;
 

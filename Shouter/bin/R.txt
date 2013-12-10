@@ -5,9 +5,7 @@ int attr cameraTargetLat 0x7f010004
 int attr cameraTargetLng 0x7f010005
 int attr cameraTilt 0x7f010006
 int attr cameraZoom 0x7f010007
-int attr customFont 0x7f010010
 int attr mapType 0x7f010002
-int attr shadowColors 0x7f010011
 int attr uiCompass 0x7f010008
 int attr uiRotateGestures 0x7f010009
 int attr uiScrollGestures 0x7f01000a
@@ -129,12 +127,6 @@ int style AppTheme 0x7f090001
 int[] styleable AdsAttrs { 0x7f010000, 0x7f010001 }
 int styleable AdsAttrs_adSize 0
 int styleable AdsAttrs_adUnitId 1
-int[] styleable CustomTextView { 0x01010162, 0x01010163, 0x01010164, 0x7f010010, 0x7f010011 }
-int styleable CustomTextView_android_shadowDx 0
-int styleable CustomTextView_android_shadowDy 1
-int styleable CustomTextView_android_shadowRadius 2
-int styleable CustomTextView_customFont 3
-int styleable CustomTextView_shadowColors 4
 int[] styleable MapAttrs { 0x7f010002, 0x7f010003, 0x7f010004, 0x7f010005, 0x7f010006, 0x7f010007, 0x7f010008, 0x7f010009, 0x7f01000a, 0x7f01000b, 0x7f01000c, 0x7f01000d, 0x7f01000e, 0x7f01000f }
 int styleable MapAttrs_cameraBearing 1
 int styleable MapAttrs_cameraTargetLat 2

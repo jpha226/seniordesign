@@ -1,6 +1,7 @@
 package com.example.shouter;
 
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -40,6 +41,12 @@ public class PostActivity extends Activity {
 		return true;
 	}
 	
+	
+    private void setupActionBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+    }
 	
 	public void postMessage(View view){
 		
