@@ -29,15 +29,20 @@
         android:layout_marginLeft="2dp"
         android:text="@string/button_refresh" />
     
-         <ListView
-             android:id="@+id/listView"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:layout_alignParentBottom="true"
-             android:layout_below="@+id/post"
-             android:layout_marginTop="5dp"
-             android:background="@android:color/white"
-             android:divider="@android:color/black"
-             android:dividerHeight="2dp" />
+	<com.handmark.pulltorefresh.library.PullToRefreshListView
+        android:id="@+id/pull_refresh_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/post"
+        android:layout_marginTop="5dp"
+        android:background="@android:color/white"
+        android:divider="@android:color/black"
+        android:dividerHeight="2dp"
+        android:fadingEdge="none"
+        android:fastScrollEnabled="false"
+        android:footerDividersEnabled="false"
+        android:headerDividersEnabled="false"
+        android:smoothScrollbar="true"  />
     
 </RelativeLayout>

@@ -3,7 +3,6 @@ package com.example.shouter;
 
 import android.app.Activity;
 import android.content.IntentSender;
-import android.location.Location;
 import android.os.Bundle;
 
 import com.google.android.gms.common.ConnectionResult;

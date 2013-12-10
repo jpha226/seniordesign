@@ -1,8 +1,6 @@
 package com.example.shouter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import android.app.Activity;
 import android.location.Location;

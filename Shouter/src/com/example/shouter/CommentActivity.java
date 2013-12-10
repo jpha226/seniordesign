@@ -3,18 +3,11 @@ package com.example.shouter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
-
-import com.example.shouter.util.ShouterAPI;
-import com.example.shouter.util.ShouterAPIDelegate;
-import com.google.android.gms.location.LocationListener;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -22,6 +15,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
@@ -29,11 +23,18 @@ import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.shouter.util.ShouterAPI;
+import com.example.shouter.util.ShouterAPIDelegate;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public class CommentActivity extends Activity implements ShouterAPIDelegate{
 
@@ -46,6 +47,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
         /* Dialogs */
         public static final int DIALOG_LOADING = 0;
         private ListView lv;
+        //public PullToRefreshListView lv;
         private String shout_id;
         
         
@@ -74,6 +76,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 shout_id = intent.getStringExtra(MainActivity.EXTRA_ID);
                 
                 // Create text view
+                
                 TextView textView = (TextView) findViewById(R.id.comment_text);
                 textView.setTextSize(40);
                 textView.setText(message);
@@ -81,19 +84,28 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 api = new ShouterAPI();
                 api.setDelegate(this);
                 
-                View view = findViewById(R.id.postComment);
+                final View view = findViewById(R.id.postComment);
                 
-               // initList();
+                //lv = (PullToRefreshListView) findViewById(R.id.pull_refresh_list_comment);
                 lv = (ListView) findViewById(R.id.CommentListView);
                 
                 SimpleAdapter adapter = new SimpleAdapter(this, commentMap, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
                 lv.setAdapter(adapter);
                 
+        		/*lv.setOnRefreshListener(new OnRefreshListener<ListView>() {
+        		    @Override
+        		    public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+        		    	refresh(findViewById(R.id.refresh));
+        		    	//refresh(view);
+        		        new GetDataTask().execute();
+        		    }
+        		});  */
+        		
                 refresh(view);
                 
                 // Show the Up button in the action bar.
                 setupActionBar(); // Josiah was here
-                        
+                     
         }
 
         /**
@@ -150,7 +162,8 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
         public void refresh(View view){
                 
                 List<Shout> newShouts = new ArrayList<Shout>();
-                //Toast.makeText(CommentActivity.this, "ParentId of get: " +shout_id,Toast.LENGTH_LONG).show();
+                Toast.makeText(CommentActivity.this, "ParentId of get: " +shout_id,Toast.LENGTH_LONG).show();
+                api.setDelegate(CommentActivity.this);
                 showDialog(DIALOG_LOADING);
                 newShouts = api.getComment(shout_id);
                 
@@ -174,8 +187,9 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                         
                         String lon = myShout.getLongitude();
                         String lat = myShout.getLatitude();
-                        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-
+                        //Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                        	api = new ShouterAPI();
+                        	api.setDelegate(CommentActivity.this);
                         try {
                                 
                                 showDialog(DIALOG_LOADING);
@@ -219,7 +233,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 						//Toast.makeText(CommentActivity.this, "There was a catch" + e1.toString(),Toast.LENGTH_LONG).show();
                 						Toast.makeText(CommentActivity.this, "Error Getting Comments, Please try again" + e1.toString(),Toast.LENGTH_LONG).show();
                 					}
-                					//Toast.makeText(CommentActivity.this, "GET" + result.substring(12, result.length()-1),Toast.LENGTH_LONG).show();
+                					Toast.makeText(CommentActivity.this, "GET" + result.substring(12, result.length()-1),Toast.LENGTH_LONG).show();
                 					// Testing stuff 
                 					commentMap = new ArrayList<Map<String,String>>();
                 					for (Shout s : api.getShoutList()) {
@@ -280,62 +294,27 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
 
 
         public void onRegistrationReturn(ShouterAPI api, final String result, final Exception e){}
-        public void onPostShoutReturn(ShouterAPI api, final String result,
-        		final Exception e) {
-        	runOnUiThread(new Runnable() {
-        		@Override
-        		public void run() {
-        			if (!isFinishing())
-        				dismissDialog(DIALOG_LOADING);
-
-        			if (e != null)
-        				Toast.makeText(CommentActivity.this, e.toString(),
-        						Toast.LENGTH_LONG).show();
-        			else {
-        				Toast.makeText(CommentActivity.this, "POST" + result, Toast.LENGTH_LONG).show();
-
-			}
-		}
-	});
-}
-    	public List<Shout> onGetShoutReturn(final ShouterAPI api,
-    			final String result, final Exception e) {
-    		final List<Shout> shoutList = new ArrayList<Shout>();
-    		runOnUiThread(new Runnable() {
-    			@Override
-    			public void run() {
-    				if (!isFinishing())
-    					dismissDialog(DIALOG_LOADING);
-
-    				if (e != null)
-    					Toast.makeText(CommentActivity.this, e.toString(),Toast.LENGTH_LONG).show();
-    				else {
-    					List<Shout> shoutList = new ArrayList();
-    					Gson gson = new Gson();
-    					try {
-    						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {};
-    						shoutList = gson.fromJson(result.substring(13,result.length()-1), token.getType());
-    						Collections.reverse(shoutList);
-    						api.setShoutList(shoutList);
-    					} catch (Exception e1) {
-    						//e1.printStackTrace();
-    						Toast.makeText(CommentActivity.this, "There was a catch" + e1.toString(),Toast.LENGTH_LONG).show();
-    					}
-    					Toast.makeText(CommentActivity.this, "GET" + result.substring(10, result.length()-1),Toast.LENGTH_LONG).show();
-    					// Testing stuff 
-    					
-    					for (Shout s : api.getShoutList()) {
-    						Toast.makeText(CommentActivity.this, "NEWSHOUTTEST" + s.getMessage(),Toast.LENGTH_LONG).show();
-    						commentMap.add(0, Utility.createShout("shout", s));
-    					//	shouts.add(0, s);
-    					}
-
-    					SimpleAdapter adapter = new SimpleAdapter(CommentActivity.this, commentMap,android.R.layout.simple_list_item_1, new String[] { "shout" },new int[] { android.R.id.text1 });
-    					lv.setAdapter(adapter);
-    				}
-    			}
-    		});
-    		return shoutList;
-    	}
+        public void onPostShoutReturn(ShouterAPI api, final String result,final Exception e) {}
+    	public List<Shout> onGetShoutReturn(final ShouterAPI api, final String result, final Exception e) { return null;}
+    	
+    	
+    	/*private class GetDataTask extends AsyncTask<Void, Void, String[]> {
+            @Override
+            protected String[] doInBackground(Void... params) {
+                    // Simulates a background job.
+                    try {
+                            Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                    }
+                    String[] mStrings = null;
+    				return mStrings;
+            }
+    	    @Override
+    	    protected void onPostExecute(String[] result) {
+    	        // Call onRefreshComplete when the list has been refreshed.
+    	        lv.onRefreshComplete();
+    	        super.onPostExecute(result);
+    	    }
+    	}*/
        
 }

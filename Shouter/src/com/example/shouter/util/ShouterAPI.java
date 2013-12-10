@@ -14,9 +14,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import android.widget.Toast;
-
-import com.example.shouter.MainActivity;
 import com.example.shouter.Shout;
 
 /**
