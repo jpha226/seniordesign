@@ -1,12 +1,14 @@
 package com.example.shouter;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import android.location.Location;
 
 public class Shout {
 
-	private String message, id, latitude, longitude, phoneId, parentID;
+	private String message, id, latitude, longitude, phoneId, parentID, timestamp;
 	private Timestamp time_stamp;
 
 	// Constructor
@@ -58,8 +60,14 @@ public class Shout {
 		return longitude;
 	}
 
-	public Timestamp getTime() {
-		return time_stamp;
+	public String getTime() {
+		
+		return format(Long.parseLong(timestamp),0);
+	}
+	
+	public static String format(long mnSeconds, long mnNanoseconds) {
+	    SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
+	    return sdf.format(new Date(mnSeconds*1000 + mnNanoseconds/1000000));
 	}
 
 	// Mutator functions

@@ -8,27 +8,15 @@
 
     <Button
         android:id="@+id/post" 
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/button_send"
         android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@+id/refresh"
         android:layout_alignParentLeft="true"
         android:background="#2E64FE"
         android:layout_marginRight="2dp"
         android:onClick="postShout"/>
-                
-    <Button
-        android:id = "@+id/refresh"
-        android:layout_width="165dp"
-        android:layout_height="wrap_content"
-        android:onClick="refresh"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:background="#2E64FE"
-        android:layout_marginLeft="2dp"
-        android:text="@string/button_refresh" />
-    
+
 	<com.handmark.pulltorefresh.library.PullToRefreshListView
         android:id="@+id/pull_refresh_list"
         android:layout_width="wrap_content"

@@ -68,7 +68,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	private static final String Shouter_URL = "http://shouterapi-env.elasticbeanstalk.com/shouter";
 
 	/* Dialogs */
-	//public static final int DIALOG_LOADING = 0;
+	public static final int DIALOG_LOADING = 0;
 	
 	
     public static final String PROPERTY_REG_ID = "registration_id";
@@ -76,6 +76,8 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 	//private ListView lv; // The list
 	public PullToRefreshListView lv;
+	int refresh_flag;
+	
 	/**
      * Substitute you own sender ID here. This is the project number you got
      * from the API Console, as described in "Getting Started."
@@ -97,7 +99,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
     String regid;
 	
 	//@Override
-	/*protected Dialog onCreateDialog(int id) {
+	protected Dialog onCreateDialog(int id) {
 		ProgressDialog dialog = null;
 		switch (id) {
 		case DIALOG_LOADING:
@@ -108,37 +110,37 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 			break;
 		}
 		return dialog;
-	}*/
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_main);
-		final View view = findViewById(R.id.refresh);
+		//final View view = findViewById(R.id.refresh);
 		
 		context = getApplicationContext();
 		
 		gcm = GoogleCloudMessaging.getInstance(this);
         
 		regid = getRegistrationId(context);
-		Toast.makeText(this, "regid:" + regid, Toast.LENGTH_LONG).show();
+		//Toast.makeText(this, "regid:" + regid, Toast.LENGTH_LONG).show();
         if (regid.isEmpty()) {
-        	Toast.makeText(this, "past regid", Toast.LENGTH_LONG).show();
+        	//Toast.makeText(this, "past regid", Toast.LENGTH_LONG).show();
             registerInBackground();
       
     	} else {
     		Log.i(TAG, "No valid Google Play Services APK found.");
     	}
 		
-		
+		refresh_flag = 0;
 		//updateLocation();
-		refresh(view);
+		refresh();
 		lv = (PullToRefreshListView) findViewById(R.id.pull_refresh_list);;
 
 		SimpleAdapter adapter = new SimpleAdapter(this, shoutMap,
-				android.R.layout.simple_list_item_1, new String[] { "shout" },
-				new int[] { android.R.id.text1 });
+				android.R.layout.simple_list_item_2, new String[] { "shout", "header" },
+				new int[] { android.R.id.text1, android.R.id.text2 });
 		lv.setAdapter(adapter);
 
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -147,13 +149,13 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 			public void onItemClick(AdapterView<?> parentAdapter, View view,
 					int position, long id) {
 
-				TextView clickedView = (TextView) view;
+				//TextView clickedView = (TextView) view;
 
 				Intent intent = new Intent(MainActivity.this,
 						CommentActivity.class);
-				String message = (String) clickedView.getText();
+				//String message = (String) clickedView.getText();
 
-				intent.putExtra(EXTRA_MESSAGE, message);
+				intent.putExtra(EXTRA_MESSAGE, shouts.get(position).getMessage());
 				intent.putExtra(EXTRA_ID, shouts.get(position).getID());
 
 				startActivity(intent);
@@ -165,7 +167,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		lv.setOnRefreshListener(new OnRefreshListener<ListView>() {
 		    @Override
 		    public void onRefresh(PullToRefreshBase<ListView> refreshView) {
-		    	refresh(view);
+		    	refresh();
 		        // Do work to refresh the list here.
 		        new GetDataTask().execute();
 		    }
@@ -226,43 +228,47 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 * 
 	 * @author Josiah
 	 */ 
-	public void refresh(View view) {
+	public void refresh() {
+		
+		if (refresh_flag == 0){
+			refresh_flag = 1;
+			userLocation = new UserLocation(this, GPS_RESOLUTION);
 
-		userLocation = new UserLocation(this, GPS_RESOLUTION);
+			userLocation.requestLocationUpdates(userLocation.defaultRequest(),
+					new LocationListener() {
 
-		userLocation.requestLocationUpdates(userLocation.defaultRequest(),
-				new LocationListener() {
-
-					@Override
-					public void onLocationChanged(Location loc) {
-
-						userLocation.disconnect();
-
-						if (loc != null) {
-
-							location = loc;
+						@Override
+						public void onLocationChanged(Location loc) {
 							
-							List<Shout> newShouts = new ArrayList<Shout>();
-							String lat = "";
-							String lon = "";
+							userLocation.disconnect();
 
-							if (location != null) {
-								lat = Shout.convert(loc.getLatitude());
-								lon = Shout.convert(loc.getLongitude());
+							if (loc != null) {
+
+								location = loc;
+							
+								List<Shout> newShouts = new ArrayList<Shout>();
+								String lat = "";
+								String lon = "";
+								
+								if (location != null) {
+									lat = Shout.convert(loc.getLatitude());
+									lon = Shout.convert(loc.getLongitude());
+
+								}
+								Toast.makeText(MainActivity.this,"in refresh", Toast.LENGTH_LONG).show();
+								api = new ShouterAPI();
+								api.setDelegate(MainActivity.this);
+							
+								showDialog(DIALOG_LOADING);
+								api.getShout(lat, lon);
 
 							}
-							api = new ShouterAPI();
-							api.setDelegate(MainActivity.this);
-							
-							//showDialog(DIALOG_LOADING);
-							api.getShout(lat, lon);
 
 						}
 
-					}
-
-				});
-		
+					});
+				refresh_flag = 0;
+			}
 	}
 
 
@@ -274,11 +280,12 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 *            The shout to be added to the list
 	 * @return
 	 */
-	private HashMap<String, String> createShout(String name, Shout shout) {
+	private HashMap<String, String> createShout(Shout shout) {
 
 		shouts.add(shout);
 		HashMap<String, String> item = new HashMap<String, String>();
-		item.put(name, shout.toString());
+		item.put("shout", shout.getMessage());
+		item.put("header", "Name: "+shout.getUser() + " - Time: " + shout.getTime());
 		return item;
 
 	}
@@ -318,7 +325,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 				    		api.setDelegate(MainActivity.this);
 				    		try {
 
-				    			//showDialog(DIALOG_LOADING);
+				    			showDialog(DIALOG_LOADING);
 				    			api.postShout(myShout);
 				    		
 				    		} catch (JsonGenerationException e) {
@@ -356,7 +363,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 			@Override
 			public void run() {
 				if (!isFinishing())
-					//dismissDialog(DIALOG_LOADING);
+					dismissDialog(DIALOG_LOADING);
 
 				if (e != null)
 					Toast.makeText(MainActivity.this, "Error Getting Shouts, Please Try Again",Toast.LENGTH_LONG).show();
@@ -376,11 +383,11 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 					// Testing stuff 
 					shoutMap = new ArrayList<Map<String,String>>();
 					for (Shout s : api.getShoutList()) {
-						shoutMap.add(0, createShout("shout", s));
+						shoutMap.add(0, createShout(s));
 						shouts.add(0, s);
 					}
 
-					SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, shoutMap,android.R.layout.simple_list_item_1, new String[] { "shout" },new int[] { android.R.id.text1 });
+					SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, shoutMap,android.R.layout.simple_list_item_2, new String[] {"shout","header" },new int[] { android.R.id.text1, android.R.id.text2 });
 					lv.setAdapter(adapter);
 				}
 			}
@@ -404,7 +411,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 			@Override
 			public void run() {
 				if (!isFinishing())
-					//dismissDialog(DIALOG_LOADING);
+					dismissDialog(DIALOG_LOADING);
 
 				if (e != null)
 					Toast.makeText(MainActivity.this, "Error Posting Shout, Please Try Again",Toast.LENGTH_LONG).show();
@@ -424,12 +431,12 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 					// Testing stuff 
 					shoutMap = new ArrayList<Map<String,String>>();
 					for (Shout s : api.getShoutList()) {
-						shoutMap.add(0, createShout("shout", s));
+						shoutMap.add(0, createShout(s));
 						shouts.add(0, s);
 						//Toast.makeText(this, "Just received: " + s.getID(), Toast.LENGTH_LONG);
 					}
 
-					SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, shoutMap,android.R.layout.simple_list_item_1, new String[] { "shout" },new int[] { android.R.id.text1 });
+					SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, shoutMap,android.R.layout.simple_list_item_2, new String[] {"shout", "header" },new int[] { android.R.id.text1, android.R.id.text2 });
 					lv.setAdapter(adapter);
 				}
 			}
@@ -644,7 +651,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
         protected String[] doInBackground(Void... params) {
                 // Simulates a background job.
                 try {
-                        Thread.sleep(100);
+                        Thread.sleep(4000);
                 } catch (InterruptedException e) {
                 }
                 String[] mStrings = null;
