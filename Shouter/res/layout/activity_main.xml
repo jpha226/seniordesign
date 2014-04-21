@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="5dp"
+    android:background="@android:color/black"
     android:orientation="vertical">
 
     <Button
@@ -13,7 +14,7 @@
         android:text="@string/button_send"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:background="#2E64FE"
+        android:background="#5260f2"
         android:layout_marginRight="2dp"
         android:onClick="postShout"/>
 
@@ -31,6 +32,7 @@
         android:fastScrollEnabled="false"
         android:footerDividersEnabled="false"
         android:headerDividersEnabled="false"
-        android:smoothScrollbar="true"  />
+        android:smoothScrollbar="true"
+        android:listSelector="@drawable/list_selector"  />
     
 </RelativeLayout>

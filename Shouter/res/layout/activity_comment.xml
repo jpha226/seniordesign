@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="5dp"
+    android:background="@android:color/black"
     tools:context=".CommentActivity" >
 
     
@@ -13,7 +14,7 @@
         android:textSize="40sp"
         android:layout_alignParentTop="true"
         android:layout_marginBottom="5dp"
-        android:background="#BDBDBD"
+        android:background="@android:color/white"
         />
     
      <Button 
@@ -21,7 +22,7 @@
         android:layout_height="50dp"
         android:text="@string/comment_send"
         android:layout_below="@+id/comment_text"
-        android:background="#0000ff"
+        android:background="#5260f2"
         android:id="@+id/postComment"
         android:onClick="postComment"/>
      
@@ -43,7 +44,7 @@
              android:layout_below="@+id/postComment"
              android:divider="@android:color/black"
              android:dividerHeight="2dp"
-             android:background="#AFAFAF"
+             android:background="@android:color/white"
              android:layout_marginBottom="5dp"
              />
     

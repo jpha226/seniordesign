@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import android.app.Activity;
 import android.location.Location;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
 
@@ -42,15 +43,30 @@ public class Utility {
         
         	return location;
 	}
+	
+	public static HashMap<String, String> createShout(Shout shout) {
 
-	public static HashMap<String, String> createShout(String name, Shout shout) {
+		//shouts.add(shout);
+		HashMap<String, String> item = new HashMap<String, String>();
+		item.put("message", shout.getMessage());
+		//Toast.makeText(MainActivity.this,"TIme " + shout.getTimestamp(), Toast.LENGTH_LONG).show();
+		item.put("username", shout.getUserName());
+		item.put("timestamp", shout.getTime());
+		//item.put("shout", shout.getMessage());
+		//item.put("header", "Name: "+shout.getUser() + " - Time: " + shout.getTime());
+		//item.put("header", "Name: "+ "Test User" + " - Time: " + shout.getTime());
+		return item;
+
+	}
+
+	/*public static HashMap<String, String> createShout(String name, Shout shout) {
 
 		//shouts.add(shout);
 		HashMap<String, String> item = new HashMap<String, String>();
 		item.put(name, shout.toString());
 		return item;
 
-	}
+	}*/
 	
 
 }

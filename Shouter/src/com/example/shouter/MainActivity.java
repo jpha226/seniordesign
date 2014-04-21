@@ -2,6 +2,7 @@ package com.example.shouter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +13,11 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.springframework.web.client.RestTemplate;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -24,14 +27,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.shouter.util.LazyAdapter;
 //import com.androidtools.Networking;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
@@ -65,7 +70,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	private List<Shout> innerShoutList = new ArrayList<Shout>();
 	private ShouterAPI api; // API to call
 	private RestTemplate REST =com.androidtools.networking.Networking.defaultRest();
-	private static final String Shouter_URL = "http://shouterapi-env.elasticbeanstalk.com/shouter";
+	private static final String Shouter_URL = "http://shouter-dev.elasticbeanstalk.com";
 
 	/* Dialogs */
 	public static final int DIALOG_LOADING = 0;
@@ -136,11 +141,12 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		refresh_flag = 0;
 		//updateLocation();
 		refresh();
-		lv = (PullToRefreshListView) findViewById(R.id.pull_refresh_list);;
+		lv = (PullToRefreshListView) findViewById(R.id.pull_refresh_list);
 
-		SimpleAdapter adapter = new SimpleAdapter(this, shoutMap,
-				android.R.layout.simple_list_item_2, new String[] { "shout", "header" },
-				new int[] { android.R.id.text1, android.R.id.text2 });
+		//SimpleAdapter adapter = new SimpleAdapter(this, shoutMap,
+		//		android.R.layout.simple_list_item_2, new String[] { "shout", "header" },
+		//		new int[] { android.R.id.text1, android.R.id.text2 });
+		LazyAdapter adapter = new LazyAdapter(this, shoutMap);
 		lv.setAdapter(adapter);
 
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -154,9 +160,9 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 				Intent intent = new Intent(MainActivity.this,
 						CommentActivity.class);
 				//String message = (String) clickedView.getText();
-
-				intent.putExtra(EXTRA_MESSAGE, shouts.get(position).getMessage());
-				intent.putExtra(EXTRA_ID, shouts.get(position).getID());
+				//Toast.makeText(MainActivity.this, "Posistion: "+position+ " ShoutID: "+ shouts.get(position - 1).getID(), Toast.LENGTH_LONG).show();
+				intent.putExtra(EXTRA_MESSAGE, shoutMap.get(position - 1).get("message"));
+				intent.putExtra(EXTRA_ID, shouts.get(position - 1).getID());
 
 				startActivity(intent);
 
@@ -204,9 +210,39 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 		//String message = editText.getText().toString();
 		//editText.setText("");
 
-        Intent intent = new Intent(MainActivity.this, PostActivity.class);
-        intent.putExtra(EXTRA_INT, PostActivity.MAIN_ACTIVITY);
-        startActivityForResult(intent, POST_REQUEST);
+		//Current working version opens new activity
+        //Intent intent = new Intent(MainActivity.this, PostActivity.class);
+        //intent.putExtra(EXTRA_INT, PostActivity.MAIN_ACTIVITY);
+        //startActivityForResult(intent, POST_REQUEST);
+		
+		final EditText input = new EditText(this);
+		AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
+		LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+		//final EditText editText = (EditText) findViewById(R.id.edit_message);
+		builder.setView(inflater.inflate(R.layout.dialog_post_message, null))
+	    .setTitle("Post Shout")
+	    .setView(input)
+	    .setPositiveButton("Shout", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int whichButton) {
+	        		String message = input.getText().toString();
+	        		Toast.makeText(MainActivity.this,"Message: " + message, Toast.LENGTH_LONG).show();
+	        		if (message!=null){
+	        			locationPost(message);
+	        		}
+	        		else
+	        			Toast.makeText(MainActivity.this, "Don't you want to type domething before you Shout", Toast.LENGTH_LONG).show();
+	        }
+	    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int whichButton) {
+	            // Do nothing.
+	        }
+	    }).show();
+		
+		
+		 //Not working
+		 //PostDialogFragment newFragment = new PostDialogFragment();
+		 //newFragment.show(getSupportFragmentManager(), "postShout");
+		
 	}
 	
 	 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -255,11 +291,11 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 									lon = Shout.convert(loc.getLongitude());
 
 								}
-								Toast.makeText(MainActivity.this,"in refresh", Toast.LENGTH_LONG).show();
+								//Toast.makeText(MainActivity.this,"in refresh", Toast.LENGTH_LONG).show();
 								api = new ShouterAPI();
 								api.setDelegate(MainActivity.this);
 							
-								showDialog(DIALOG_LOADING);
+								//showDialog(DIALOG_LOADING);
 								api.getShout(lat, lon);
 
 							}
@@ -282,10 +318,19 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 */
 	private HashMap<String, String> createShout(Shout shout) {
 
-		shouts.add(shout);
+		shouts.add(0,shout);
 		HashMap<String, String> item = new HashMap<String, String>();
-		item.put("shout", shout.getMessage());
-		item.put("header", "Name: "+shout.getUser() + " - Time: " + shout.getTime());
+		if (null != shout.getMessage()){
+			item.put("message", shout.getMessage());
+			//Toast.makeText(MainActivity.this,"TIme " + shout.getTimestamp(), Toast.LENGTH_LONG).show();
+			item.put("username", shout.getUserName());
+			item.put("timestamp", shout.getTime());
+			item.put("likes", "Likes: "+String.valueOf(shout.getNumLikes()));
+			item.put("comments", "Comments: "+String.valueOf(shout.getNumComments()));
+		}
+		
+		//item.put("shout", shout.getMessage());
+		//item.put("header", "Name: "+shout.getUser() + " - Time: " + shout.getTime());
 		return item;
 
 	}
@@ -363,7 +408,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 			@Override
 			public void run() {
 				if (!isFinishing())
-					dismissDialog(DIALOG_LOADING);
+					//dismissDialog(DIALOG_LOADING);
 
 				if (e != null)
 					Toast.makeText(MainActivity.this, "Error Getting Shouts, Please Try Again",Toast.LENGTH_LONG).show();
@@ -373,21 +418,24 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 					try {
 						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {};
 						shoutList = gson.fromJson(result.substring(10,result.length()-1), token.getType());
-						//Collections.reverse(shoutList);
+						Collections.reverse(shoutList);
 						api.setShoutList(shoutList);
 					} catch (Exception e1) {
 						//e1.printStackTrace();
 						Toast.makeText(MainActivity.this, "Error Please try again",Toast.LENGTH_LONG).show();
 					}
 					//Toast.makeText(MainActivity.this, "GET" + result.substring(10, result.length()-1),Toast.LENGTH_LONG).show();
-					// Testing stuff 
+					// Testing stuff
 					shoutMap = new ArrayList<Map<String,String>>();
 					for (Shout s : api.getShoutList()) {
-						shoutMap.add(0, createShout(s));
-						shouts.add(0, s);
+						Toast.makeText(MainActivity.this, "getshouts" + api.getShoutList().size(),Toast.LENGTH_LONG).show();
+						if (null!= s.getMessage()){
+							shoutMap.add(0, createShout(s));
+						}	
 					}
-
-					SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, shoutMap,android.R.layout.simple_list_item_2, new String[] {"shout","header" },new int[] { android.R.id.text1, android.R.id.text2 });
+						
+					//SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, shoutMap,android.R.layout.simple_list_item_2, new String[] {"shout","header" },new int[] { android.R.id.text1, android.R.id.text2 });
+					LazyAdapter adapter = new LazyAdapter(MainActivity.this, shoutMap);
 					lv.setAdapter(adapter);
 				}
 			}
@@ -421,7 +469,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 					try {
 						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {};
 						shoutList = gson.fromJson(result.substring(10,result.length()-1), token.getType());
-						//Collections.reverse(shoutList);
+						Collections.reverse(shoutList);
 						api.setShoutList(shoutList);
 					} catch (Exception e1) {
 						//e1.printStackTrace();
@@ -432,11 +480,12 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 					shoutMap = new ArrayList<Map<String,String>>();
 					for (Shout s : api.getShoutList()) {
 						shoutMap.add(0, createShout(s));
-						shouts.add(0, s);
-						//Toast.makeText(this, "Just received: " + s.getID(), Toast.LENGTH_LONG);
+						//shouts.add(0, s);
+						//Toast.makeText(MainActivity.this, "Just received: " + s.getID(), Toast.LENGTH_LONG);
 					}
 
-					SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, shoutMap,android.R.layout.simple_list_item_2, new String[] {"shout", "header" },new int[] { android.R.id.text1, android.R.id.text2 });
+					//SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, shoutMap,android.R.layout.simple_list_item_2, new String[] {"shout", "header" },new int[] { android.R.id.text1, android.R.id.text2 });
+					LazyAdapter adapter = new LazyAdapter(MainActivity.this, shoutMap);
 					lv.setAdapter(adapter);
 				}
 			}
@@ -547,7 +596,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	}
 
 	private String getRegistrationId(Context context) {
-	    Toast.makeText(this, "get regis", Toast.LENGTH_LONG).show();
+	    //Toast.makeText(this, "get regis", Toast.LENGTH_LONG).show();
 		final SharedPreferences prefs = getGCMPreferences(context);
 	    String registrationId = prefs.getString(PROPERTY_REG_ID, "");
 	    if (registrationId.isEmpty()) {
@@ -587,7 +636,7 @@ public class MainActivity extends Activity implements ShouterAPIDelegate {// imp
 	 * shared preferences.
 	 */
 	private void registerInBackground() {
-	    Toast.makeText(this, "register", Toast.LENGTH_LONG).show();
+	    //Toast.makeText(this, "register", Toast.LENGTH_LONG).show();
 		new AsyncTask<Object, Object, Object>() {
 	        @Override
 	        protected String doInBackground(Object... params) {

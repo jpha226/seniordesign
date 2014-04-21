@@ -8,8 +8,9 @@ import android.location.Location;
 
 public class Shout {
 
-	private String message, id, latitude, longitude, phoneId, parentID, timestamp;
+	private String message, id, latitude, longitude, phoneId, parentID, timestamp, userName;
 	private Timestamp time_stamp;
+	private int numLikes, numComments;
 
 	// Constructor
 	public Shout(String m, Location loc) {
@@ -61,8 +62,15 @@ public class Shout {
 	}
 
 	public String getTime() {
+		if (null!= timestamp){
+			return format(Long.parseLong(timestamp),0);
+		}
+		return null;
+	}
+	
+	public String getTimestamp() {
 		
-		return format(Long.parseLong(timestamp),0);
+		return timestamp;
 	}
 	
 	public static String format(long mnSeconds, long mnNanoseconds) {
@@ -109,5 +117,29 @@ public class Shout {
 		}
 		String conDeg = "" + degrees;
 		return conDeg;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public int getNumComments() {
+		return numComments;
+	}
+
+	public void setNumComments(int numComments) {
+		this.numComments = numComments;
+	}
+
+	public int getNumLikes() {
+		return numLikes;
+	}
+
+	public void setNumLikes(int numLikes) {
+		this.numLikes = numLikes;
 	}
 }

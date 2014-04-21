@@ -23,7 +23,7 @@ import com.example.shouter.Shout;
  */
 public class ShouterAPI {
 
-	private static final String Shouter_URL = "http://shouterapi-env.elasticbeanstalk.com/shouter";
+	private static final String Shouter_URL = "http://shouter-dev.elasticbeanstalk.com";
 
 	private ExecutorService executor;
 	private ShouterAPIDelegate delegate;
@@ -110,11 +110,11 @@ public class ShouterAPI {
 
 					HttpEntity<String> request = new HttpEntity<String>(headers);
 					// TODO: Need to seperate Location into long and lat
-					String url = Shouter_URL + path + "?phoneId="
+					String url = Shouter_URL + path + "?devKey=sh0ut3r&userName="
 							+ message.getID() + "&message="
 							+ message.getMessage() + "&latitude="
 							+ message.getLatitude() + "&longitude="
-							+ message.getLongitude() + "&parentId="
+							+ message.getLongitude() + "&shoutId="
 							+ message.getParent();
 					// Post Entity to URL
 					response = REST.exchange(url, HttpMethod.POST, request,
@@ -148,10 +148,10 @@ public class ShouterAPI {
 			public void run() {
 				ResponseEntity<String> response = null;
 				try {
-
+					//TODO:Fix Username being hardcoded.
 					HttpHeaders headers = new HttpHeaders();
 					HttpEntity<String> request = new HttpEntity<String>(headers);
-					String url = Shouter_URL + path + "?latitude=" + latitude
+					String url = Shouter_URL + path + "?devKey=sh0ut3r&userName=testUser&latitude=" + latitude
 							+ "&longitude=" + longitude;
 					response = REST.exchange(url, HttpMethod.GET, request,
 							String.class);
@@ -184,11 +184,11 @@ public class ShouterAPI {
 				try {
 					HttpHeaders headers = new HttpHeaders();
 					HttpEntity<String> request = new HttpEntity<String>(headers);
-					String url = Shouter_URL + path + "?phoneId="
+					String url = Shouter_URL + path + "?devKey=sh0ut3r&userName="
 							+ message.getUser() + "&message="
 							+ message.getMessage() + "&latitude="
 							+ message.getLatitude() + "&longitude="
-							+ message.getLongitude() + "&parentId="
+							+ message.getLongitude() + "&shoutId="
 							+ message.getParent();
 					response = REST.exchange(url, HttpMethod.POST, request,
 							String.class);
@@ -221,7 +221,7 @@ public class ShouterAPI {
 
 					HttpHeaders headers = new HttpHeaders();
 					HttpEntity<String> request = new HttpEntity<String>(headers);
-					String url = Shouter_URL + path + "?parentId=" + parentId;
+					String url = Shouter_URL + path + "?devKey=sh0ut3r&userName=testUser&shoutId=" + parentId;
 					response = REST.exchange(url, HttpMethod.GET, request,
 							String.class);
 					shoutList = delegate.onGetCommentReturn(ShouterAPI.this,

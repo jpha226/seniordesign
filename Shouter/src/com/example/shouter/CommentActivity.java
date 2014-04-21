@@ -11,8 +11,10 @@ import org.codehaus.jackson.map.JsonMappingException;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -20,14 +22,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.support.v4.app.NavUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.shouter.util.LazyAdapter;
 import com.example.shouter.util.ShouterAPI;
 import com.example.shouter.util.ShouterAPIDelegate;
 import com.google.gson.Gson;
@@ -89,7 +94,11 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 //lv = (PullToRefreshListView) findViewById(R.id.pull_refresh_list_comment);
                 lv = (ListView) findViewById(R.id.CommentListView);
                 
-                SimpleAdapter adapter = new SimpleAdapter(this, commentMap, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
+                //SimpleAdapter adapter = new SimpleAdapter(this, commentMap, android.R.layout.simple_list_item_1, new String[]{"shout"}, new int[]{android.R.id.text1});
+                //SimpleAdapter adapter = new SimpleAdapter(this, commentMap,
+        		//		android.R.layout.simple_list_item_2, new String[] { "shout", "header" },
+        		//		new int[] { android.R.id.text1, android.R.id.text2 });
+                LazyAdapter adapter = new LazyAdapter(CommentActivity.this, commentMap);
                 lv.setAdapter(adapter);
                 
         		/*lv.setOnRefreshListener(new OnRefreshListener<ListView>() {
@@ -116,6 +125,7 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                         getActionBar().setDisplayHomeAsUpEnabled(true);
                 }
+                getActionBar().setTitle("Shouter");
         }
 
         @Override
@@ -150,9 +160,52 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
          */
         public void postComment(View view){
                 
-                Intent intent = new Intent(CommentActivity.this, PostActivity.class);
-                intent.putExtra(EXTRA_INT, PostActivity.COMMENT_ACTIVITY);      
-                startActivityForResult(intent, POST_REQUEST);
+        	
+        	final EditText input = new EditText(this);
+    		AlertDialog.Builder builder=new AlertDialog.Builder(CommentActivity.this);
+    		LayoutInflater inflater = CommentActivity.this.getLayoutInflater();
+    		//final EditText editText = (EditText) findViewById(R.id.edit_message);
+    		builder.setView(inflater.inflate(R.layout.dialog_post_message, null))
+    	    .setTitle("Post Shout")
+    	    .setView(input)
+    	    .setPositiveButton("Shout", new DialogInterface.OnClickListener() {
+    	        public void onClick(DialogInterface dialog, int whichButton) {
+    	        	
+    	    		String message = input.getText().toString();
+    	        	Toast.makeText(CommentActivity.this,"Message: " + message, Toast.LENGTH_LONG).show();
+    	        	Location loc = Utility.updateLocation(CommentActivity.this);
+                    
+                    Shout myShout = new Shout(message, loc);
+                    String id = Secure.getString(CommentActivity.this.getContentResolver(),Secure.ANDROID_ID); 
+                    
+                    myShout.setUser(id);
+                    myShout.setParent(shout_id);
+                    
+                    String lon = myShout.getLongitude();
+                    String lat = myShout.getLatitude();
+                    //Toast.makeText(this, "message: " + myShout.getMessage(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(this, "PhoneId: " + myShout.getUser(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(this, "parentID: "+ myShout.getParent(), Toast.LENGTH_LONG).show();
+                    	api = new ShouterAPI();
+                    	api.setDelegate(CommentActivity.this);
+                    try {
+                            
+                            showDialog(DIALOG_LOADING);
+                            api.postComment(myShout);
+                            
+                    } catch (JsonGenerationException e) {e.printStackTrace();} catch (JsonMappingException e) {e.printStackTrace();} catch (IOException e) {e.printStackTrace();}  
+    	            //Editable value = view.getText(); 
+    	        }
+    	    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    	        public void onClick(DialogInterface dialog, int whichButton) {
+    	            // Do nothing.
+    	        }
+    	    }).show();
+    		
+    		
+                //Intent intent = new Intent(CommentActivity.this, PostActivity.class);
+                //intent.putExtra(EXTRA_INT, PostActivity.COMMENT_ACTIVITY);      
+                //startActivityForResult(intent, POST_REQUEST);
         }
         
         
@@ -162,7 +215,8 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
         public void refresh(View view){
                 
                 List<Shout> newShouts = new ArrayList<Shout>();
-                Toast.makeText(CommentActivity.this, "ParentId of get: " +shout_id,Toast.LENGTH_LONG).show();
+                //Toast.makeText(CommentActivity.this, "ParentId of get: " +shout_id,Toast.LENGTH_LONG).show();
+                api = new ShouterAPI();
                 api.setDelegate(CommentActivity.this);
                 showDialog(DIALOG_LOADING);
                 newShouts = api.getComment(shout_id);
@@ -182,12 +236,14 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                         Shout myShout = new Shout(message, loc);
                         String id = Secure.getString(this.getContentResolver(),Secure.ANDROID_ID); 
                         
-                        myShout.setID(id);
+                        myShout.setUser(id);
                         myShout.setParent(shout_id);
                         
                         String lon = myShout.getLongitude();
                         String lat = myShout.getLatitude();
-                        //Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                        //Toast.makeText(this, "message: " + myShout.getMessage(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(this, "PhoneId: " + myShout.getUser(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(this, "parentID: "+ myShout.getParent(), Toast.LENGTH_LONG).show();
                         	api = new ShouterAPI();
                         	api.setDelegate(CommentActivity.this);
                         try {
@@ -225,7 +281,12 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 					Gson gson = new Gson();
                 					try {
                 						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {};
-                						shoutList = gson.fromJson(result.substring(12,result.length()-1), token.getType());
+                						String[] sepResult= result.split("comments\":");
+                						String[] secSepResult = sepResult[1].split(",\"liked");
+                						//Toast.makeText(CommentActivity.this, "Parsed?" + result,Toast.LENGTH_LONG).show();
+                						//Toast.makeText(CommentActivity.this, "Parsed?" + secSepResult[0],Toast.LENGTH_LONG).show();
+                						shoutList = gson.fromJson(secSepResult[0], token.getType());
+                						//shoutList = gson.fromJson(result.substring(12,result.length()-1), token.getType());
                 						Collections.reverse(shoutList);
                 						api.setShoutList(shoutList);
                 					} catch (Exception e1) {
@@ -233,15 +294,17 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 						//Toast.makeText(CommentActivity.this, "There was a catch" + e1.toString(),Toast.LENGTH_LONG).show();
                 						Toast.makeText(CommentActivity.this, "Error Getting Comments, Please try again" + e1.toString(),Toast.LENGTH_LONG).show();
                 					}
-                					Toast.makeText(CommentActivity.this, "GET" + result.substring(12, result.length()-1),Toast.LENGTH_LONG).show();
+                					//Toast.makeText(CommentActivity.this, "GET" + result.substring(12, result.length()-1),Toast.LENGTH_LONG).show();
                 					// Testing stuff 
                 					commentMap = new ArrayList<Map<String,String>>();
                 					for (Shout s : api.getShoutList()) {
-                						commentMap.add(0, Utility.createShout("shout", s));
+                						commentMap.add(0, Utility.createShout(s));
                 						//shouts.add(0, s);
                 					}
 
-                					SimpleAdapter adapter = new SimpleAdapter(CommentActivity.this, commentMap,android.R.layout.simple_list_item_1, new String[] { "shout" },new int[] { android.R.id.text1 });
+                					//SimpleAdapter adapter = new SimpleAdapter(CommentActivity.this, commentMap,android.R.layout.simple_list_item_1, new String[] { "shout" },new int[] { android.R.id.text1 });
+                					//SimpleAdapter adapter = new SimpleAdapter(CommentActivity.this, commentMap,android.R.layout.simple_list_item_2, new String[] {"shout","header" },new int[] { android.R.id.text1, android.R.id.text2 });
+                					LazyAdapter adapter = new LazyAdapter(CommentActivity.this, commentMap);
                 					lv.setAdapter(adapter);
                 				}
                 			}
@@ -270,7 +333,12 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 					Gson gson = new Gson();
                 					try {
                 						TypeToken<List<Shout>> token = new TypeToken<List<Shout>>() {};
-                						shoutList = gson.fromJson(result.substring(12,result.length()-1), token.getType());
+                						String[] sepResult= result.split("comments\":");
+                						String[] secSepResult = sepResult[1].split(",\"liked");
+                						//Toast.makeText(CommentActivity.this, "Parsed?" + result,Toast.LENGTH_LONG).show();
+                						//Toast.makeText(CommentActivity.this, "Parsed?" + secSepResult[0],Toast.LENGTH_LONG).show();
+                						shoutList = gson.fromJson(secSepResult[0], token.getType());
+                						//shoutList = gson.fromJson(result.substring(12,result.length()-1), token.getType());
                 						Collections.reverse(shoutList);
                 						api.setShoutList(shoutList);
                 					} catch (Exception e1) {
@@ -281,11 +349,13 @@ public class CommentActivity extends Activity implements ShouterAPIDelegate{
                 					// Testing stuff 
                 					commentMap = new ArrayList<Map<String,String>>();
                 					for (Shout s : api.getShoutList()) {
-                						commentMap.add(0, Utility.createShout("shout", s));
+                						commentMap.add(0, Utility.createShout(s));
                 						//shouts.add(0, s);
                 					}
 
-                					SimpleAdapter adapter = new SimpleAdapter(CommentActivity.this, commentMap,android.R.layout.simple_list_item_1, new String[] { "shout" },new int[] { android.R.id.text1 });
+                					//SimpleAdapter adapter = new SimpleAdapter(CommentActivity.this, commentMap,android.R.layout.simple_list_item_1, new String[] { "shout" },new int[] { android.R.id.text1 });
+                					//SimpleAdapter adapter = new SimpleAdapter(CommentActivity.this, commentMap,android.R.layout.simple_list_item_2, new String[] {"shout", "header" },new int[] { android.R.id.text1, android.R.id.text2 });
+                					LazyAdapter adapter = new LazyAdapter(CommentActivity.this, commentMap);
                 					lv.setAdapter(adapter);
                 				}
                 			}

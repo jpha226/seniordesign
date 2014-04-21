@@ -7,5 +7,6 @@
 	<classpathentry exported="true" kind="lib" path="/AndroidTools/bin/androidtools.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/AndroidTools"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry kind="lib" path="C:/Users/Craig/adt-bundle-windows-x86_64-20130917/adt-bundle-windows-x86_64-20130917/sdk/extras/google/gcm/gcm-client/dist/gcm.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
